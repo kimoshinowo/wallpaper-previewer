@@ -9,12 +9,6 @@ from matplotlib import pyplot as plt
 import PIL.Image as pil
 
 def estimate_depth(image):
-    # checkpoint = "vinvino02/glpn-nyu"
-    # depth_estimator = pipeline("depth-estimation", model=checkpoint)
-    # predictions = depth_estimator(image)
-    # depth_image = predictions["depth"]
-    # plt.imsave('images/outputs/depth-output.png', depth_image)
-
     processor = GLPNImageProcessor.from_pretrained("vinvino02/glpn-nyu")
     model = GLPNForDepthEstimation.from_pretrained("vinvino02/glpn-nyu")
 
@@ -36,28 +30,6 @@ def estimate_depth(image):
     # visualize the prediction
     output = prediction.squeeze().cpu().numpy()
     formatted = (output * 255 / np.max(output)).astype("uint8")
-    
-    # model = DPTForDepthEstimation.from_pretrained("Intel/dpt-hybrid-midas")
-    # feature_extractor = DPTFeatureExtractor.from_pretrained("Intel/dpt-hybrid-midas")
-
-    # # prepare image for the model
-    # inputs = feature_extractor(images=image, return_tensors="pt")
-
-    # with torch.no_grad():
-    #     outputs = model(**inputs)
-    #     predicted_depth = outputs.predicted_depth
-
-    # # interpolate to original size
-    # prediction = torch.nn.functional.interpolate(
-    #     predicted_depth.unsqueeze(1),
-    #     size=image.size[::-1],
-    #     mode="bicubic"
-    # )
-
-    # # visualize the prediction
-    # output = prediction.squeeze().cpu().numpy()
-    # formatted = (output * 255 / np.max(output)).astype("uint8")
-    
     depth = pil.fromarray(formatted)
 
     plt.imsave('images/outputs/depth-output.png', depth)
