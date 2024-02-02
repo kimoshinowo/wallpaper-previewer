@@ -7,8 +7,7 @@ import PIL.Image as pil
 ctx = mx.cpu(0) # using cpu
 
 def get_pretrained_model():
-    # pretrained_model = gluoncv.model_zoo.get_deeplab_resnet101_ade(pretrained=True)
-    pretrained_model = gluoncv.model_zoo.get_psp_resnet101_ade(pretrained=True)
+    pretrained_model = gluoncv.model_zoo.get_deeplab_resnet101_ade(pretrained=True)
     return pretrained_model
 
 def get_segementation(input_img, seg_model):
