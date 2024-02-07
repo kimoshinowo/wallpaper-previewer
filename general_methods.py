@@ -1,9 +1,8 @@
 import cv2
 import numpy as np
 import PIL.Image as pil
-from matplotlib import pyplot as plt
 from mxnet import image as mimage
-from PIL import ImageFilter
+from scipy.ndimage.filters import gaussian_filter
 
 
 def import_and_resize(filename: str) -> pil.Image:
@@ -135,7 +134,7 @@ def find_non_wall_indices(labels: np.ndarray) -> np.ndarray:
 
 
 def get_matrix(line: np.ndarray) -> np.ndarray:
-    """ !!!
+    """!!!
 
     Parameters
     ----------
@@ -145,7 +144,7 @@ def get_matrix(line: np.ndarray) -> np.ndarray:
     Returns
     -------
     np.ndarray
-        !!! 
+        !!!
     """
     y_round = np.round(line.copy(), 0).astype(int)
     y_round = y_round - np.nanmin(line)
@@ -164,54 +163,106 @@ def get_matrix(line: np.ndarray) -> np.ndarray:
 
 
 # !!! I've assumed this is going to be removed
-def makeShadow(image, iterations, border, offset, backgroundColour, shadowColour):
-    # image: base image to give a drop shadow
-    # iterations: number of times to apply the blur filter to the shadow
-    # border: border to give the image to leave space for the shadow
-    # offset: offset of the shadow as [x,y]
-    # backgroundCOlour: colour of the background
-    # shadowColour: colour of the drop shadow
+# def makeShadow(image, iterations, border, offset, backgroundColour, shadowColour):
+#     # image: base image to give a drop shadow
+#     # iterations: number of times to apply the blur filter to the shadow
+#     # border: border to give the image to leave space for the shadow
+#     # offset: offset of the shadow as [x,y]
+#     # backgroundCOlour: colour of the background
+#     # shadowColour: colour of the drop shadow
 
-    # Calculate the size of the shadow's image
-    fullWidth = image.size[0] + abs(offset[0]) + 2 * border
-    fullHeight = image.size[1] + abs(offset[1]) + 2 * border
+#     # Calculate the size of the shadow's image
+#     fullWidth = image.size[0] + abs(offset[0]) + 2 * border
+#     fullHeight = image.size[1] + abs(offset[1]) + 2 * border
 
-    # Create the shadow's image. Match the parent image's mode.
-    shadow = pil.new(image.mode, (fullWidth, fullHeight), backgroundColour)
+#     # Create the shadow's image. Match the parent image's mode.
+#     shadow = pil.new(image.mode, (fullWidth, fullHeight), backgroundColour)
 
-    # Place the shadow, with the required offset
-    shadowLeft = border + max(offset[0], 0)  # if <0, push the rest of the image right
-    shadowTop = border + max(offset[1], 0)  # if <0, push the rest of the image down
-    # Paste in the constant colour
-    shadow.paste(
-        shadowColour,
-        [shadowLeft, shadowTop, shadowLeft + image.size[0], shadowTop + image.size[1]],
-    )
+#     # Place the shadow, with the required offset
+#     shadowLeft = border + max(offset[0], 0)  # if <0, push the rest of the image right
+#     shadowTop = border + max(offset[1], 0)  # if <0, push the rest of the image down
+#     # Paste in the constant colour
+#     shadow.paste(
+#         shadowColour,
+#         [shadowLeft, shadowTop, shadowLeft + image.size[0], shadowTop + image.size[1]],
+#     )
 
-    # Apply the BLUR filter repeatedly
-    for i in range(iterations):
-        shadow = shadow.filter(ImageFilter.BLUR)
+#     # Apply the BLUR filter repeatedly
+#     for i in range(iterations):
+#         shadow = shadow.filter(ImageFilter.BLUR)
 
-    # Paste the original image on top of the shadow
-    imgLeft = border - min(offset[0], 0)  # if the shadow offset was <0, push right
-    imgTop = border - min(offset[1], 0)  # if the shadow offset was <0, push down
-    shadow.paste(image, (imgLeft, imgTop))
+#     # Paste the original image on top of the shadow
+#     imgLeft = border - min(offset[0], 0)  # if the shadow offset was <0, push right
+#     imgTop = border - min(offset[1], 0)  # if the shadow offset was <0, push down
+#     shadow.paste(image, (imgLeft, imgTop))
 
-    return shadow
+#     return shadow
 
 
 # !!! I've assumed this isn't finished yet
-def add_shadows(image, corner_inds, height, width, other, walls):
-    shadow_image = image.copy()
+# def add_shadows(image, corner_inds, height, width, other, walls):
+#     shadow_image = image.copy()
 
-    lines = np.ones((height, width, 3), dtype=np.uint8) * 255
-    lines[:, corner_inds] = [0, 0, 0]
-    lines = pil.fromarray(lines, "RGB")
+#     lines = np.ones((height, width, 3), dtype=np.uint8) * 255
+#     lines[:, corner_inds] = [0, 0, 0]
+#     lines = pil.fromarray(lines, "RGB")
 
-    line = np.zeros((height, 3, 3), dtype=np.uint8)
-    line = pil.fromarray(line, "RGB")
-    shadow = makeShadow(line, 5, 50, [0, 0], "white", "black")
+#     line = np.zeros((height, 3, 3), dtype=np.uint8)
+#     line = pil.fromarray(line, "RGB")
+#     shadow = makeShadow(line, 5, 50, [0, 0], "white", "black")
 
-    plt.imshow(lines)
+#     plt.imshow(lines)
+#     return shadow_image
 
-    return shadow_image
+
+def add_shadows(
+    image: np.ndarray,
+    corners: np.ndarray,
+    shadow_width: int,
+    shadow_opacity: int,
+    walls: np.ndarray = None,
+) -> np.ndarray:
+    """Adds appearance of vertical shadow to a specific column area of an image.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        Input image of a room interior.
+    corners : np.ndarray
+        Column indices of where on the room image corners are located.
+    shadow_width : int
+        The width of the shadow pre-blurring, as a percentage of image width.
+    shadow_opacity : int
+        How opaque the shadow is, higher values cause less visible shadow.
+    walls : np.ndarray, optional
+        Indices of the input image which are walls, by default None
+
+    Returns
+    -------
+    np.ndarray
+        The input image with shadow added at corner locations, masked by any wall indices provided.
+    """
+    shadow_width = np.clip(
+        np.round(image.shape[1] * (shadow_width / 100), 0).astype(int),
+        0,
+        image.shape[0],
+    )
+
+    lines = np.zeros(image.shape)
+    for i in range(len(corners)):
+        lines[:, corners[i] - shadow_width : corners[i] + shadow_width] = [
+            255,
+            255,
+            255,
+        ]
+    lines = gaussian_filter(lines, sigma=image.shape[1] / shadow_opacity)
+
+    if walls is not None:
+        image[walls[0], walls[1]] = (
+            image[walls[0], walls[1]] - lines[walls[0], walls[1]]
+        )
+    else:
+        image = image - lines
+    image = np.clip(image, 0, 255).astype(int)
+
+    return image
