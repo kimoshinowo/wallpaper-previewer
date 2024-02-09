@@ -5,7 +5,7 @@ import cv2
 from matplotlib import pyplot as plt
 
 
-def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray) -> np.ndarray:
+def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray, width: int) -> np.ndarray:
     """Performs clusting on the hough and harris corners to find likely room corners.
 
     Parameters
@@ -31,10 +31,9 @@ def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray) -> np.nd
 
     if all_corners.size >= 0:
         # Find only most dense clusters
-        clf = DBSCAN(eps=20, min_samples=max((all_corners.size / 4), 200)).fit(
+        clf = DBSCAN(eps=(0.01*width), min_samples=max((all_corners.size / 4), 200)).fit(
             all_corners.reshape(-1, 1)
         )
-        # clf = DBSCAN(eps=20, min_samples=(all_corners.size/4)).fit(all_corners.reshape(-1, 1))
 
         # Find centers of clusters by taking means
         centers = []
