@@ -218,7 +218,7 @@ def get_matrix(line: np.ndarray) -> np.ndarray:
 def add_shadows(
     image: np.ndarray,
     corners: np.ndarray,
-    shadow_width: int,
+    shadow_line_width: int,
     shadow_fade: int,
     shadow_opacity: float
 ) -> np.ndarray:
@@ -230,8 +230,10 @@ def add_shadows(
         Input image of a room interior.
     corners : np.ndarray
         Column indices of where on the room image corners are located.
-    shadow_width : int
+    shadow_line_width : int
         The width of the shadow pre-blurring, as a percentage of image width.
+    shadow_fade : int
+        The fade of the shadow.
     shadow_opacity : int
         How opaque the shadow is, higher values cause less visible shadow.
 
@@ -240,20 +242,22 @@ def add_shadows(
     np.ndarray
         The input image with shadow added at corner locations.
     """
-    shadow_width = np.clip(
-        np.round(image.shape[1] * (shadow_width / 100), 0).astype(int),
+    shadow_line_width = np.clip(
+        np.round(image.shape[1] * (shadow_line_width / 100), 0).astype(int),
         0,
         image.shape[0],
     )
 
-    lines = np.zeros(image.shape)
+    lines = np.zeros(np.concatenate(([len(corners)], image.shape)))
     for i in range(len(corners)):
-        lines[:, corners[i] - shadow_width : corners[i] + shadow_width] = [
+        lines[i, :, corners[i] - shadow_line_width : corners[i] + shadow_line_width] = [
             255,
             255,
             255,
         ]
-    lines = gaussian_filter(lines, sigma=image.shape[1] / shadow_fade) / shadow_opacity
+        lines[i] = gaussian_filter(lines[i], sigma=image.shape[1] / shadow_fade) / shadow_opacity
+    
+    lines= np.amax(lines, axis=0)
 
     image = image - lines
     image = np.clip(image, 0, 255).astype(int)
