@@ -219,8 +219,8 @@ def add_shadows(
     image: np.ndarray,
     corners: np.ndarray,
     shadow_width: int,
-    shadow_opacity: int,
-    walls: np.ndarray = None,
+    shadow_fade: int,
+    shadow_opacity: float
 ) -> np.ndarray:
     """Adds appearance of vertical shadow to a specific column area of an image.
 
@@ -234,13 +234,11 @@ def add_shadows(
         The width of the shadow pre-blurring, as a percentage of image width.
     shadow_opacity : int
         How opaque the shadow is, higher values cause less visible shadow.
-    walls : np.ndarray, optional
-        Indices of the input image which are walls, by default None
 
     Returns
     -------
     np.ndarray
-        The input image with shadow added at corner locations, masked by any wall indices provided.
+        The input image with shadow added at corner locations.
     """
     shadow_width = np.clip(
         np.round(image.shape[1] * (shadow_width / 100), 0).astype(int),
@@ -255,14 +253,9 @@ def add_shadows(
             255,
             255,
         ]
-    lines = gaussian_filter(lines, sigma=image.shape[1] / shadow_opacity)
+    lines = gaussian_filter(lines, sigma=image.shape[1] / shadow_fade) / shadow_opacity
 
-    if walls is not None:
-        image[walls[0], walls[1]] = (
-            image[walls[0], walls[1]] - lines[walls[0], walls[1]]
-        )
-    else:
-        image = image - lines
+    image = image - lines
     image = np.clip(image, 0, 255).astype(int)
 
     return image
