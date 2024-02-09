@@ -31,7 +31,7 @@ def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray, width: i
 
     if all_corners.size >= 0:
         # Find only most dense clusters
-        clf = DBSCAN(eps=(0.01*width), min_samples=max((all_corners.size / 4), 200)).fit(
+        clf = DBSCAN(eps=(0.02*width), min_samples=max((all_corners.size * 0.25), 200)).fit(
             all_corners.reshape(-1, 1)
         )
 
