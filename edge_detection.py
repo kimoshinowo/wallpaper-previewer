@@ -55,11 +55,16 @@ def get_segmented_edges(edge_map: pil.Image, walls: np.ndarray) -> np.ndarray:
 
 def hough_transform(image: np.ndarray, height: int, width: int) -> np.ndarray:
     """Performs the hough transform.
+    Adapted from: https://www.geeksforgeeks.org/line-detection-python-opencv-houghline-method/
 
     Parameters
     ----------
     image : np.ndarray
         Image on which to perform the hough transform.
+    height : int
+        The height of the image on which to perform the hough transform.
+    width : int
+        The width of the image on which to perform the hough transform.
 
     Returns
     -------
@@ -97,7 +102,7 @@ def hough_transform(image: np.ndarray, height: int, width: int) -> np.ndarray:
 
 def get_vertical_lines(hough_img: np.ndarray) -> np.ndarray:
     """Get vertical lines only.
-     Adapted from: https://www.youtube.com/watch?v=veoz_46gOkc
+    Adapted from: https://www.youtube.com/watch?v=veoz_46gOkc
 
     Parameters
     ----------
