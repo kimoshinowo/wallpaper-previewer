@@ -95,7 +95,8 @@ def hough_transform(image: np.ndarray) -> np.ndarray:
 
 
 def get_vertical_lines(hough_img: np.ndarray) -> np.ndarray:
-    """Get vertical lines only - https://www.youtube.com/watch?v=veoz_46gOkc
+    """Get vertical lines only.
+     Adapted from: https://www.youtube.com/watch?v=veoz_46gOkc
 
     Parameters
     ----------
