@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import PIL.Image as pil
 from matplotlib import pyplot as plt
+from statistics import mean
 
 
 def detect_edges(image: np.ndarray) -> pil.Image:
@@ -52,7 +53,7 @@ def get_segmented_edges(edge_map: pil.Image, walls: np.ndarray) -> np.ndarray:
     return segmented_edges
 
 
-def hough_transform(image: np.ndarray) -> np.ndarray:
+def hough_transform(image: np.ndarray, height: int, width: int) -> np.ndarray:
     """Performs the hough transform.
 
     Parameters
@@ -76,8 +77,8 @@ def hough_transform(image: np.ndarray) -> np.ndarray:
         1,  # Distance resolution in pixels
         np.pi / 180,  # Angle resolution in radians
         threshold=50,  # Min number of votes for valid line
-        minLineLength=25,  # Min allowed length of line
-        maxLineGap=15,  # Max allowed gap between line for joining them
+        minLineLength=(0.03 * mean([height, width])),  # Min allowed length of line
+        maxLineGap=(0.02 * mean([height, width])),  # Max allowed gap between line for joining them
     )
 
     # Iterate over points
