@@ -1,6 +1,4 @@
-from transformers import pipeline
 from transformers import GLPNImageProcessor, GLPNForDepthEstimation
-from transformers import DPTForDepthEstimation, DPTFeatureExtractor
 import torch
 import cv2
 import numpy as np
