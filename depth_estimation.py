@@ -81,20 +81,6 @@ def get_mean_depths(depth_image: pil.Image, other: np.ndarray) -> np.ndarray:
     return mean_depth
 
 
-# https://stackoverflow.com/questions/47519626/using-numpy-scipy-to-identify-slope-changes-in-digital-signals
-def savgol_corners(mean_depth):
-    window = 55
-    savgol = savgol_filter(mean_depth, window_length=window, polyorder=2, deriv=2)
-    max_savgol = np.nanmax(np.abs(savgol))
-    large = np.where(np.abs(savgol) > max_savgol / 2)[0]
-    gaps = np.diff(large) > window
-    begins = np.insert(large[1:][gaps], 0, large[0])
-    ends = np.append(large[:-1][gaps], large[-1])
-    changes = ((begins + ends) / 2).astype(int)
-
-    return changes
-
-
 def harris_corners(matrix: np.ndarray) -> np.ndarray:
     """Performs and plots harris corner detection on the minimised mean depth per column of the estimated depth map.
 
