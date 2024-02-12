@@ -134,7 +134,7 @@ def find_non_wall_indices(labels: np.ndarray) -> np.ndarray:
 
 
 def get_matrix(line: np.ndarray) -> np.ndarray:
-    """!!!
+    """Create a matrix image of a line graph.
 
     Parameters
     ----------
@@ -144,7 +144,7 @@ def get_matrix(line: np.ndarray) -> np.ndarray:
     Returns
     -------
     np.ndarray
-        !!!
+        Matrix version of the line graph.
     """
     y_round = np.round(line.copy(), 0).astype(int)
     y_round = y_round - np.nanmin(line)

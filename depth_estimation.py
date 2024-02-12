@@ -90,7 +90,7 @@ def harris_corners(matrix: np.ndarray) -> np.ndarray:
     Returns
     -------
     np.ndarray
-        !!!
+        A matrix containing the mean depth line graph with corner points highlighted.
     """
     operatedImage = cv2.cvtColor(matrix, cv2.COLOR_BGR2GRAY)
     operatedImage = np.float32(operatedImage)
