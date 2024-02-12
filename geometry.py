@@ -153,71 +153,87 @@ def find_walls(contours: np.ndarray, corner_inds: np.ndarray) -> list:
     return corner_adj_geom
 
 
-def find_quadrilaterals(corner_adj_geom, width):
-    geom = []
+def make_edges_parallel(convex_hull: np.ndarray, width: int) -> np.ndarray:
+    """Make the vertical edges of the polygon parallel.
 
-    # for each shape
-    for i in range(len(corner_adj_geom)):
-        # try multiple thresholds
-        for j in np.linspace(0.01, 0.1):
-            # find convex hull
-            convex_hull = cv2.convexHull(corner_adj_geom[i])
-            # calc the polygon
-            convex_hull = cv2.approxPolyDP(
-                convex_hull, j * cv2.arcLength(convex_hull, True), True
-            )
+    Parameters
+    ----------
+    convex_hull : np.ndarray
+        Corner points of the polygon.
+    width : int
+        Width of the input image.
 
-            # if polygon has length of 4, keep it and break loop
-            if len(convex_hull) == 4:
-                convex_hull = convex_hull.reshape((4, 2))
+    Returns
+    -------
+    np.ndarray
+        Corner points of the polygon.
+    """
+    temp_0 = convex_hull[0][0]
+    temp_1 = convex_hull[1][0]
+    temp_2 = convex_hull[2][0]
+    temp_3 = convex_hull[3][0]
+    biggest, smallest = [], []
 
-                temp_0 = convex_hull[0][0]
-                temp_1 = convex_hull[1][0]
-                temp_2 = convex_hull[2][0]
-                temp_3 = convex_hull[3][0]
-                biggest, smallest = [], []
+    # For each corner, if the horizontal difference between it and the corner it's compared to is less than
+    # 20% of the width of the picture, then set them to be the same
+    for ind1 in range(0, 4):
+        for ind2 in range(0, 4):
+            if (
+                abs(convex_hull[ind1][0] - convex_hull[ind2][0])
+                <= (0.2 * width)
+            ) and (convex_hull[ind1][0] != convex_hull[ind2][0]):
+                # save both the largest and smallest of the two points
+                biggest.append(
+                    max(convex_hull[ind1][0], convex_hull[ind2][0])
+                )
+                smallest.append(
+                    min(convex_hull[ind1][0], convex_hull[ind2][0])
+                )
+                # Temporarily set to the largest of the two points
+                convex_hull[ind1][0] = biggest[-1]
+                convex_hull[ind2][0] = biggest[-1]
 
-                for ind1 in range(0, 4):
-                    for ind2 in range(0, 4):
-                        if (
-                            abs(convex_hull[ind1][0] - convex_hull[ind2][0])
-                            <= (0.2 * width)
-                        ) and (convex_hull[ind1][0] != convex_hull[ind2][0]):
-                            biggest.append(
-                                max(convex_hull[ind1][0], convex_hull[ind2][0])
-                            )
-                            smallest.append(
-                                min(convex_hull[ind1][0], convex_hull[ind2][0])
-                            )
-                            convex_hull[ind1][0] = biggest[-1]
-                            convex_hull[ind2][0] = biggest[-1]
+    count = 0
+    left = set()
 
-                count = 0
-                left = set()
+    for x in range(0, 4):
+        for y in range(0, 4):
+            if abs(convex_hull[x][0] - convex_hull[y][0]) <= 20:
+                count += 1
+            if (
+                convex_hull[x][0] < convex_hull[y][0]
+            ):  # find which is the left side of the wall
+                left.add(x)
 
-                for x in range(0, 4):
-                    for y in range(0, 4):
-                        if abs(convex_hull[x][0] - convex_hull[y][0]) <= 20:
-                            count += 1
-                        if (
-                            convex_hull[x][0] < convex_hull[y][0]
-                        ):  # find which is the left side of the wall
-                            left.add(x)
+    # if a point is on the left, set it to the min of the two points rather than the max
+    if len(smallest) > 0:
+        for x in range(0, 4):
+            if x in left and convex_hull[x][0] in biggest:
+                convex_hull[x][0] = min(smallest)
 
-                if len(smallest) > 0:
-                    for x in range(0, 4):
-                        if x in left and convex_hull[x][0] in biggest:
-                            convex_hull[x][0] = min(smallest)
+    # if all 4 points have been set to the same x-value, revert the change
+    if count > 8:
+        convex_hull[0][0] = temp_0
+        convex_hull[1][0] = temp_1
+        convex_hull[2][0] = temp_2
+        convex_hull[3][0] = temp_3
 
-                if count > 8:
-                    convex_hull[0][0] = temp_0
-                    convex_hull[1][0] = temp_1
-                    convex_hull[2][0] = temp_2
-                    convex_hull[3][0] = temp_3
+    return convex_hull
 
-                geom.append(convex_hull)
-                break
 
+def remove_duplicate_walls(geom: list) -> list:
+    """Remove any duplicate walls.
+
+    Parameters
+    ----------
+    geom : list
+        List of walls.
+
+    Returns
+    -------
+    list
+        New list of walls with any duplicates removed.
+    """
     new_geom = []
 
     if len(geom) > 0:
@@ -233,6 +249,46 @@ def find_quadrilaterals(corner_adj_geom, width):
 
             if seen is False:
                 new_geom.append(i)
+    
+    return new_geom
+
+
+def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
+    """Estimate quadrilaterals from the polygons already found.
+
+    Parameters
+    ----------
+    corner_adj_geom : list
+        Contours which are adjacent to the esimated wall corners.
+    width : int
+        Width of the input image.
+
+    Returns
+    -------
+    list
+        List of walls.
+    """
+    geom = []
+
+    # for each shape
+    for i in range(len(corner_adj_geom)):
+        # try multiple thresholds
+        for j in np.linspace(0.01, 0.1):
+            # find convex hull
+            convex_hull = cv2.convexHull(corner_adj_geom[i])
+            # approximate the polygon
+            convex_hull = cv2.approxPolyDP(
+                convex_hull, j * cv2.arcLength(convex_hull, True), True
+            )
+
+            # if polygon has length of 4, keep it and break loop
+            if len(convex_hull) == 4:
+                convex_hull = convex_hull.reshape((4, 2))
+                convex_hull = make_edges_parallel(convex_hull, width)
+                geom.append(convex_hull)
+                break
+
+    new_geom = remove_duplicate_walls(geom)
 
     # Plot new contours
     for i in range(len(new_geom)):
