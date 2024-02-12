@@ -22,7 +22,7 @@ def detect_edges(image: np.ndarray) -> pil.Image:
     gray = cv2.cvtColor(blur, cv2.COLOR_BGR2GRAY)  # Convert image to grayscale
     edges = cv2.Canny(gray, 15, 50, apertureSize=3)  # Use canny method
     edge_map = pil.fromarray(edges)
-    edge_map.save("images/outputs/edge-detection-output.png")
+    edge_map.save("images/outputs/intermediate-outputs/edge-detection-output.png")
 
     return edge_map
 
@@ -48,7 +48,7 @@ def get_segmented_edges(edge_map: pil.Image, walls: np.ndarray) -> np.ndarray:
     segmented_edges[walls[0], walls[1]] = edge_map_array[walls[0], walls[1]]
     segmented_edges = segmented_edges.astype(dtype=np.uint8)
 
-    pil.fromarray(segmented_edges).save("images/outputs/segmented-edges.png")
+    pil.fromarray(segmented_edges).save("images/outputs/intermediate-outputs/segmented-edges.png")
 
     return segmented_edges
 
@@ -95,7 +95,7 @@ def hough_transform(image: np.ndarray, height: int, width: int) -> np.ndarray:
         # Maintain a simples lookup list for points
         lines_list.append([(x1, y1), (x2, y2)])
 
-    cv2.imwrite("images/outputs/hough-output.png", hough_img)
+    cv2.imwrite("images/outputs/intermediate-outputs/hough-output.png", hough_img)
 
     return hough_img
 
@@ -116,8 +116,8 @@ def get_vertical_lines(hough_img: np.ndarray) -> np.ndarray:
     """
     kernel = np.ones((20, 1), np.uint8)
     vertical_lines = cv2.erode(hough_img, kernel, iterations=1)
-    cv2.imwrite("images/outputs/hough_corners.png", vertical_lines)
-    corners = plt.imread("images/outputs/hough_corners.png")[:, :, :3] * 255
+    cv2.imwrite("images/outputs/intermediate-outputs/hough_corners.png", vertical_lines)
+    corners = plt.imread("images/outputs/intermediate-outputs/hough_corners.png")[:, :, :3] * 255
 
     return corners
 

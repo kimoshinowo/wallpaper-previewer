@@ -157,7 +157,7 @@ def get_matrix(line: np.ndarray) -> np.ndarray:
         matrix[y_round[i], i] = [255, 255, 255]
 
     matrix = matrix.astype(np.uint8)
-    pil.fromarray(matrix).save("images/outputs/matrix.png")
+    pil.fromarray(matrix).save("images/outputs/intermediate-outputs/matrix.png")
 
     return matrix
 

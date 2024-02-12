@@ -75,7 +75,7 @@ def create_wall_corner_map(
     only_walls[:, corner_inds] = [0, 0, 0]
 
     pil_image = pil.fromarray(only_walls)
-    pil_image.save("images/outputs/segmented-with-corners.png")
+    pil_image.save("images/outputs/intermediate-outputs/segmented-with-corners.png")
 
     return only_walls
 
@@ -112,7 +112,7 @@ def find_contours(only_walls: np.ndarray) -> np.ndarray:
 
         plt.plot(np.array(data)[:, 0], -np.array(data)[:, 1])
 
-    plt.savefig("images/outputs/contours.png")
+    plt.savefig("images/outputs/intermediate-outputs/contours.png")
     plt.clf()
     return final_cnt
 
@@ -148,7 +148,7 @@ def find_walls(contours: np.ndarray, corner_inds: np.ndarray) -> list:
         data = np.append(corner_adj_geom[i], corner_adj_geom[i][0]).reshape(-1, 2)
         plt.plot(np.array(data)[:, 0], -np.array(data)[:, 1])
 
-    plt.savefig("images/outputs/corner-contours.png")
+    plt.savefig("images/outputs/intermediate-outputs/corner-contours.png")
     plt.clf()
     return corner_adj_geom
 
@@ -295,6 +295,6 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
         data = np.append(new_geom[i], new_geom[i][0]).reshape(-1, 2)
         plt.plot(np.array(data)[:, 0], -np.array(data)[:, 1])
 
-    plt.savefig("images/outputs/final-contours.png")
+    plt.savefig("images/outputs/intermediate-outputs/final-contours.png")
     plt.clf()
     return new_geom

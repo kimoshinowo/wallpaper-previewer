@@ -43,9 +43,9 @@ def get_segementation(
     predict = mx.nd.squeeze(mx.nd.argmax(output, 1)).asnumpy()
 
     mask = gluoncv.utils.viz.get_color_pallete(predict, "ade20k")
-    mask.save("images/outputs/segmentation-output.png")
+    mask.save("images/outputs/intermediate-outputs/segmentation-output.png")
 
-    mmask = mpimg.imread("images/outputs/segmentation-output.png")
+    mmask = mpimg.imread("images/outputs/intermediate-outputs/segmentation-output.png")
     return mmask
 
 
@@ -70,5 +70,5 @@ def remove_walls(input_img: np.ndarray, other: np.ndarray) -> pil.Image:
     input_copy = np.clip(input_copy, 0, 255)
 
     segmented_input = pil.fromarray(input_copy.astype(np.uint8))
-    segmented_input.save("images/outputs/segmentation-walls-only.png")
+    segmented_input.save("images/outputs/intermediate-outputs/segmentation-walls-only.png")
     return segmented_input

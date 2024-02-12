@@ -223,7 +223,7 @@ def get_transformed_wallpaper(
     else:
         result_1 = np.sum(wall_list_1, axis=0)
 
-    pil.fromarray(result_1.astype(np.uint8)).save("images/outputs/wallpaper.png")
+    pil.fromarray(result_1.astype(np.uint8)).save("images/outputs/intermediate-outputs/wallpaper.png")
 
     return (result_1, result_2)
 

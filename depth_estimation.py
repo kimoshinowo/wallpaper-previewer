@@ -44,7 +44,7 @@ def estimate_depth(image: pil.Image) -> pil.Image:
     formatted = (output * 255 / np.max(output)).astype("uint8")
     depth = pil.fromarray(formatted)
 
-    plt.imsave("images/outputs/depth-output.png", depth)
+    plt.imsave("images/outputs/intermediate-outputs/depth-output.png", depth)
 
     return depth
 
@@ -100,6 +100,6 @@ def harris_corners(matrix: np.ndarray) -> np.ndarray:
 
     # Reverting back to the original image, with optimal threshold value
     matrix[dest > 0.01 * dest.max()] = [255, 0, 0]
-    pil.fromarray(matrix.astype(np.uint8)).save("images/outputs/corners.png")
+    pil.fromarray(matrix.astype(np.uint8)).save("images/outputs/intermediate-outputs/corners.png")
 
     return matrix
