@@ -21,11 +21,7 @@ def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray, width: i
         Wall corner locations estimated via DBSCAN.
     """
 
-    # plt.scatter(hough_corners, [1]*len(hough_corners), label='hough_corners')
-    # plt.scatter(harris_corners, [1]*len(harris_corners), label='harris_corners')
-
     all_corners = np.concatenate((hough_corners, harris_corners))
-    # plt.scatter(all_corners, np.zeros(len(all_corners)), label='all_corners')
 
     corner_inds = []
 
@@ -45,10 +41,6 @@ def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray, width: i
 
         centers = np.round(centers, 0)
         corner_inds = centers.astype(int)
-
-        # plt.scatter(centers, [2]*len(centers))
-        # plt.legend()
-        # plt.show()
 
     return corner_inds
 
@@ -110,10 +102,8 @@ def find_contours(only_walls: np.ndarray) -> np.ndarray:
     for cnt in contours:
         approx = cv2.approxPolyDP(cnt, 0.03 * cv2.arcLength(cnt, True), False)
         only_walls = cv2.drawContours(only_walls, [cnt], -1, (0, 0, 255), 3)
-        # plt.scatter(approx[:, 0, 0], approx[:, 0, 1], color="r")
         final_cnt.append(approx[:, 0, :])
 
-    # plt.imshow(only_walls)
     final_cnt = np.array(final_cnt, dtype=object)
 
     # Plot the found contours
@@ -235,7 +225,6 @@ def find_quadrilaterals(corner_adj_geom, width):
         new_geom = [geom[0]]
 
         for i in geom:
-            # print(i)
             seen = False
             for j in new_geom:
                 if np.array_equal(i, j):

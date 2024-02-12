@@ -35,16 +35,6 @@ def get_transformed_wallpaper(new_geom, height, width, size):
             tr = right_points[np.argmax(right_points[:, 1])]
             br = right_points[np.argmin(right_points[:, 1])]
 
-            # x_coords = set()
-            # for i in wall_coords:
-            #     x_coords.add(i[0])
-            # x_coords = list(x_coords)
-            # if len(x_coords) >= 2:
-            #     # x = abs(x_coords[0] - x_coords[1])
-            #     x = abs(max(x_coords) - min(x_coords))
-            # else:
-            #     x = 0
-
             ys = []
             for i in wall_coords:
                 ys.append(i[1])
@@ -65,7 +55,6 @@ def get_transformed_wallpaper(new_geom, height, width, size):
                 y = 0
 
             wall_coords = np.array([bl, tl, tr, br])
-            # wall_coords = np.array([tl, br, tr, bl])
 
             # Tile the wallpaper
             temp_tiled = np.tile(
@@ -96,9 +85,6 @@ def get_transformed_wallpaper(new_geom, height, width, size):
             # Get and apply perspective transform
             matrix = cv2.getPerspectiveTransform(corners, wall_coords)
             temp_result = cv2.warpPerspective(tiled, matrix, size)
-            # plt.clf()
-            # plt.imshow(temp_result)
-            # plt.show()
             wall_list_1.append(temp_result)
 
     # Tile the wallpaper
@@ -132,11 +118,8 @@ def get_transformed_wallpaper(new_geom, height, width, size):
         result_1 = result_2
     else:
         result_1 = np.sum(wall_list_1, axis=0)
-    
-    # plt.clf()
-    # plt.imshow(result_1)
+
     pil.fromarray(result_1.astype(np.uint8)).save("images/outputs/wallpaper.png")
-    # plt.show()
     return result_1, result_2
 
 
@@ -193,7 +176,5 @@ def combine_wallpaper_and_input(
     final_output[mask_other_x, mask_other_y] = result_1[mask_other_x, mask_other_y]
 
     final_output_2[walls[0], walls[1]] = result_2[walls[0], walls[1]]
-
-    # plt.imshow(cv2.cvtColor(final_output, cv2.COLOR_BGR2RGB))
 
     return final_output, final_output_2

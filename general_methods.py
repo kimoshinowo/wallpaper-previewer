@@ -162,59 +162,6 @@ def get_matrix(line: np.ndarray) -> np.ndarray:
     return matrix
 
 
-# !!! I've assumed this is going to be removed
-# def makeShadow(image, iterations, border, offset, backgroundColour, shadowColour):
-#     # image: base image to give a drop shadow
-#     # iterations: number of times to apply the blur filter to the shadow
-#     # border: border to give the image to leave space for the shadow
-#     # offset: offset of the shadow as [x,y]
-#     # backgroundCOlour: colour of the background
-#     # shadowColour: colour of the drop shadow
-
-#     # Calculate the size of the shadow's image
-#     fullWidth = image.size[0] + abs(offset[0]) + 2 * border
-#     fullHeight = image.size[1] + abs(offset[1]) + 2 * border
-
-#     # Create the shadow's image. Match the parent image's mode.
-#     shadow = pil.new(image.mode, (fullWidth, fullHeight), backgroundColour)
-
-#     # Place the shadow, with the required offset
-#     shadowLeft = border + max(offset[0], 0)  # if <0, push the rest of the image right
-#     shadowTop = border + max(offset[1], 0)  # if <0, push the rest of the image down
-#     # Paste in the constant colour
-#     shadow.paste(
-#         shadowColour,
-#         [shadowLeft, shadowTop, shadowLeft + image.size[0], shadowTop + image.size[1]],
-#     )
-
-#     # Apply the BLUR filter repeatedly
-#     for i in range(iterations):
-#         shadow = shadow.filter(ImageFilter.BLUR)
-
-#     # Paste the original image on top of the shadow
-#     imgLeft = border - min(offset[0], 0)  # if the shadow offset was <0, push right
-#     imgTop = border - min(offset[1], 0)  # if the shadow offset was <0, push down
-#     shadow.paste(image, (imgLeft, imgTop))
-
-#     return shadow
-
-
-# !!! I've assumed this isn't finished yet
-# def add_shadows(image, corner_inds, height, width, other, walls):
-#     shadow_image = image.copy()
-
-#     lines = np.ones((height, width, 3), dtype=np.uint8) * 255
-#     lines[:, corner_inds] = [0, 0, 0]
-#     lines = pil.fromarray(lines, "RGB")
-
-#     line = np.zeros((height, 3, 3), dtype=np.uint8)
-#     line = pil.fromarray(line, "RGB")
-#     shadow = makeShadow(line, 5, 50, [0, 0], "white", "black")
-
-#     plt.imshow(lines)
-#     return shadow_image
-
-
 def add_shadows(
     image: np.ndarray,
     corners: np.ndarray,
