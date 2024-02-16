@@ -82,8 +82,8 @@ def hough_transform(image: np.ndarray, height: int, width: int) -> np.ndarray:
         1,  # Distance resolution in pixels
         np.pi / 180,  # Angle resolution in radians
         threshold=50,  # Min number of votes for valid line
-        minLineLength=(0.03 * mean([height, width])),  # Min allowed length of line
-        maxLineGap=(0.02 * mean([height, width])),  # Max allowed gap between line for joining them
+        minLineLength=(0.03 * height),  # Min allowed length of line
+        maxLineGap=(0.02 * height),  # Max allowed gap between line for joining them
     )
 
     # Iterate over points
