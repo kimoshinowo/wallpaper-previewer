@@ -70,8 +70,13 @@ def get_mean_depths(depth_image: pil.Image, other: np.ndarray) -> np.ndarray:
     mean_depth = np.nanmean(test_depth, axis=0)
     # Smooth using savgol filter
     try:
+        window_size = np.round(len(mean_depth)/20, 0).astype(int)
+
+        if window_size % 2 == 0:
+            window_size += 1
+
         mean_depth = savgol_filter(
-            mean_depth, 51, 3
+            mean_depth, window_size, 3
         )  # window size 51, polynomial order 3
     except Exception:
         mean_depth = np.nanmean(test_depth, axis=0)
