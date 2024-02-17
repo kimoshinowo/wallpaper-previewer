@@ -4,8 +4,44 @@ import PIL.Image as pil
 import cv2
 from matplotlib import pyplot as plt
 
+def cluster_corners(all_corners: np.ndarray, min_samples: int, width: int) -> np.ndarray:
+    """Find only most dense clusters for the corners
 
-def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray, savgol_corners, width: int) -> np.ndarray:
+    Parameters
+    ----------
+    all_corners : np.ndarray
+        List of all possible corner points
+    min_samples : int
+        Minimum number of samples for clustering
+    width : int
+        Width of the image
+
+    Returns
+    -------
+    np.ndarray
+        Indices of the corner points
+    """
+    corner_inds = []
+
+    clf = DBSCAN(eps=(0.02*width), min_samples=max(min_samples, 200)).fit(
+        all_corners.reshape(-1, 1)
+    )
+
+    # Find centers of clusters by taking means
+    centers = []
+    for i in np.unique(clf.labels_):
+        if i != -1:
+            ind = np.where(clf.labels_ == i)
+            ind = all_corners[ind]
+            centers.append(np.mean(ind))
+
+    centers = np.round(centers, 0)
+    corner_inds = centers.astype(int)
+
+    return corner_inds
+
+
+def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray, width: int) -> np.ndarray:
     """Performs clusting on the hough and harris corners to find likely room corners.
 
     Parameters
@@ -21,47 +57,15 @@ def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray, savgol_c
         Wall corner locations estimated via DBSCAN.
     """
     all_corners = np.concatenate((hough_corners, harris_corners))
-
-    min_samples = int(all_corners.size // 14)
-
-    # if savgol_corners.size > 0:
-    #     length = harris_corners.size
-    #     savgol_length = savgol_corners.size
-    #     div = (length//2) // savgol_length
-    #     tile = np.tile(savgol_corners, int(div))
-
-    #     all_corners = np.concatenate((harris_corners, tile))
-
-    #     min_samples = int(all_corners.size // 3)
-
-    # if savgol_corners.size > 0:
-    #     length = all_corners.size / 2
-    #     savgol_length = savgol_corners.size
-    #     div = (length//2) // savgol_length
-    #     tile = np.tile(savgol_corners, int(div))
-
-    #     all_corners = np.concatenate((all_corners, tile))
-
-    #     min_samples = int(all_corners.size // 5)
-
-    corner_inds = []
+    min_samples = int(all_corners.size // 4)
 
     if all_corners.size >= 0:
-        # Find only most dense clusters
-        clf = DBSCAN(eps=(0.02*width), min_samples=max(min_samples, 200)).fit(
-            all_corners.reshape(-1, 1)
-        )
+        corner_inds = cluster_corners(all_corners, min_samples, width)
 
-        # Find centers of clusters by taking means
-        centers = []
-        for i in np.unique(clf.labels_):
-            if i != -1:
-                ind = np.where(clf.labels_ == i)
-                ind = all_corners[ind]
-                centers.append(np.mean(ind))
-
-        centers = np.round(centers, 0)
-        corner_inds = centers.astype(int)
+        # if corner_inds.size == 0:
+        #     all_corners = np.concatenate((hough_corners, hough_corners, harris_corners, harris_corners, harris_corners))
+        #     min_samples = int(all_corners.size // 10)
+        #     corner_inds = cluster_corners(all_corners, min_samples, width)
 
     return corner_inds
 
