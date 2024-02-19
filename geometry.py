@@ -323,3 +323,27 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
     plt.savefig("images/outputs/intermediate-outputs/final-contours.png")
     plt.clf()
     return new_geom
+
+
+def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray) -> np.ndarray:
+    """!!!
+
+    Parameters
+    ----------
+    new_geom : np.ndarray
+        _description_
+    corner_inds : np.ndarray
+        _description_
+
+    Returns
+    -------
+    np.s
+        _description_
+    """
+    for cont in new_geom:
+        for i in range(4):
+            for corner in corner_inds:
+                if np.abs(cont[i][0] - corner) < 10:
+                    cont[i][0] = corner
+
+    return new_geom
