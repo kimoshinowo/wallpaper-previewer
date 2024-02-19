@@ -1,5 +1,6 @@
 import general_methods
 import edge_detection
+import geometry
 import numpy as np
 import cv2
 from matplotlib import pyplot as plt
@@ -19,6 +20,12 @@ def test_new(labels, input_cv2):
 
     segmented_input = input_copy.astype(np.uint8)
 
+    for i in range(input_cv2.shape[1]):
+        for j in range(input_cv2.shape[0]-1, -1, -1):
+            if np.array_equal(segmented_input[j][i], [1, 1, 1]):
+                segmented_input[:j, i] = np.array([1, 1, 1], dtype=float)
+                break
+
     edge_map = edge_detection.detect_edges(segmented_input)
     edge_map = np.asarray(edge_map.convert("RGB"))
 
@@ -33,9 +40,9 @@ def test_new(labels, input_cv2):
         image,  # Input edge image
         1,  # Distance resolution in pixels
         np.pi / 180,  # Angle resolution in radians
-        threshold=50,  # Min number of votes for valid line
-        minLineLength=(0.03 * input_cv2.shape[0]),  # Min allowed length of line
-        maxLineGap=(0.05 * input_cv2.shape[0]),  # Max allowed gap between line for joining them
+        threshold=10,  # Min number of votes for valid line
+        minLineLength=(0.001 * input_cv2.shape[0]),  # Min allowed length of line
+        maxLineGap=(0.5 * input_cv2.shape[0]),  # Max allowed gap between line for joining them
     )
 
     # Iterate over points
