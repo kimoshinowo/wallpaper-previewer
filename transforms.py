@@ -176,7 +176,7 @@ def get_transformed_wallpaper(
     """
     wall_list_1, wall_list_2 = [], []
     input_corners = np.float32([[0, 0], [0, height], [width, height], [width, 0]])
-    repeat_div = 80
+    repeat_div = 100
 
     if len(new_geom) > 0:
         # Find and perform transform for each wall
