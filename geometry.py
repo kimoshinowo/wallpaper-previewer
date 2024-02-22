@@ -71,7 +71,7 @@ def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray, width: i
 
 
 def create_wall_corner_map(
-    segmented_input: pil.Image,
+    segmented_input: np.ndarray,
     other: np.ndarray,
     walls: np.ndarray,
     corner_inds: np.ndarray,
@@ -94,7 +94,7 @@ def create_wall_corner_map(
     np.ndarray
         Image with white wall regions and black non-walls and wall corners. 
     """
-    only_walls = np.array(segmented_input.copy())
+    only_walls = segmented_input.copy()
     only_walls[other[0], other[1]] = [0, 0, 0]
     only_walls[walls[0], walls[1]] = [255, 255, 255]
     only_walls[:, corner_inds] = [0, 0, 0]
@@ -314,6 +314,10 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
                 break
 
     new_geom = remove_duplicate_walls(geom)
+
+    for cont in new_geom:
+        if cv2.contourArea(cont, True) < 100:
+            new_geom.remove(cont)
 
     # Plot new contours
     for i in range(len(new_geom)):

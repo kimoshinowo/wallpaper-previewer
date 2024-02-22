@@ -84,7 +84,7 @@ def get_mean_depths(depth_image: pil.Image, other: np.ndarray) -> np.ndarray:
     return mean_depth
 
 
-def harris_corners(matrix: np.ndarray) -> np.ndarray:
+def get_harris_corners(matrix: np.ndarray) -> np.ndarray:
     """Performs and plots harris corner detection on the minimised mean depth per column of the estimated depth map.
 
     Parameters
@@ -97,7 +97,8 @@ def harris_corners(matrix: np.ndarray) -> np.ndarray:
     np.ndarray
         A matrix containing the mean depth line graph with corner points highlighted.
     """
-    operatedImage = cv2.cvtColor(matrix, cv2.COLOR_BGR2GRAY)
+    operatedImage = np.float32(matrix)
+    operatedImage = cv2.cvtColor(operatedImage, cv2.COLOR_BGR2GRAY)
     operatedImage = np.float32(operatedImage)
 
     dest = cv2.cornerHarris(operatedImage, 30, 5, 0.07)

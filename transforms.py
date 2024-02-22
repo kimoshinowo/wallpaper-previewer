@@ -2,6 +2,7 @@ import numpy as np
 import cv2
 import math
 import PIL.Image as pil
+from matplotlib import pyplot as plt
 
 
 def find_hypotenuse(wall_coords: np.ndarray) -> float:
@@ -116,8 +117,17 @@ def crop_wallpaper(
     """
     y_ratio = height / repeat_div
     x_ratio = width / repeat_div
-    y_percentage = y_ratio / math.ceil(height / repeat_div)
-    x_percentage = x_ratio / math.ceil(width / repeat_div)
+
+    if math.ceil(y_ratio) != 0:
+        y_percentage = y_ratio / math.ceil(y_ratio)
+    else:
+        y_percentage = 1
+
+    if math.ceil(x_ratio) != 0:
+        x_percentage = x_ratio / math.ceil(x_ratio)
+    else:
+        x_percentage = 1
+
     tiled = temp_tiled[
         : round(y_percentage * temp_tiled.shape[0]),
         : round(x_percentage * temp_tiled.shape[1]),
@@ -222,6 +232,7 @@ def get_transformed_wallpaper(
         result_1 = result_2
     else:
         result_1 = np.sum(wall_list_1, axis=0)
+        result_1 = np.clip(result_1, 0, 255)
 
     pil.fromarray(result_1.astype(np.uint8)).save("images/outputs/intermediate-outputs/wallpaper.png")
 

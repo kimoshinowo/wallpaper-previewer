@@ -49,7 +49,7 @@ def get_segementation(
     return mmask
 
 
-def remove_walls(input_img: np.ndarray, other: np.ndarray) -> pil.Image:
+def remove_inds(input_img: np.ndarray, inds: list, colour: list) -> np.ndarray:
     """Make a copy of the image and set the indices of everything but the walls to black.
 
     Parameters
@@ -64,11 +64,16 @@ def remove_walls(input_img: np.ndarray, other: np.ndarray) -> pil.Image:
     pil.Image
         The input image with everything except the walls set to black.
     """
-    input_copy = input_img.copy().asnumpy()
+    input_copy = input_img.copy()
+    if not isinstance(input_copy, np.ndarray):
+        input_copy = input_copy.asnumpy()
     input_copy = input_copy.astype(float)
-    input_copy[other[0], other[1]] = np.array([0, 0, 0], dtype=float)
+    for ind_list in inds:
+        input_copy[ind_list[0], ind_list[1]] = np.array(colour, dtype=float)
     input_copy = np.clip(input_copy, 0, 255)
 
-    segmented_input = pil.fromarray(input_copy.astype(np.uint8))
-    segmented_input.save("images/outputs/intermediate-outputs/segmentation-walls-only.png")
+    segmented_input = input_copy.astype(np.uint8)
+    segmented_input_img = pil.fromarray(segmented_input)
+    segmented_input_img.save("images/outputs/intermediate-outputs/segmentation-walls-only.png")
+
     return segmented_input

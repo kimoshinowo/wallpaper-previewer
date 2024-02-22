@@ -53,7 +53,7 @@ def get_segmented_edges(edge_map: pil.Image, walls: np.ndarray) -> np.ndarray:
     return segmented_edges
 
 
-def hough_transform(image: np.ndarray, height: int, width: int) -> np.ndarray:
+def hough_transform(image: np.ndarray, height: int, threshold: int, minLineLengthPerc: float, maxLineGapPerc: float) -> np.ndarray:
     """Performs the hough transform.
     Adapted from: https://www.geeksforgeeks.org/line-detection-python-opencv-houghline-method/
 
@@ -81,9 +81,9 @@ def hough_transform(image: np.ndarray, height: int, width: int) -> np.ndarray:
         image,  # Input edge image
         1,  # Distance resolution in pixels
         np.pi / 180,  # Angle resolution in radians
-        threshold=50,  # Min number of votes for valid line
-        minLineLength=(0.03 * height),  # Min allowed length of line
-        maxLineGap=(0.02 * height),  # Max allowed gap between line for joining them
+        threshold=threshold,  # Min number of votes for valid line
+        minLineLength=(minLineLengthPerc * height),  # Min allowed length of line
+        maxLineGap=(maxLineGapPerc * height),  # Max allowed gap between line for joining them
     )
 
     # Iterate over points

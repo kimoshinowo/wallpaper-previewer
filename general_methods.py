@@ -21,7 +21,7 @@ def import_and_resize(filename: str) -> pil.Image:
 
     input_img = pil.open(filename)
     input_img.thumbnail((1000, 1000))
-    input_img.save(filename)
+    input_img.save("images/outputs/intermediate-outputs/resized-input.png")
     return input_img
 
 
@@ -59,7 +59,7 @@ def import_cv2_image(filename: str) -> np.ndarray:
     return input_img
 
 
-def get_labels_string(mmask: np.ndarray) -> np.ndarray:
+def get_labels_string(mmask: np.ndarray, rng: int) -> np.ndarray:
     """Combines rgb values of an image  into a string at each pixel to use as a label.
 
     Parameters
@@ -73,7 +73,7 @@ def get_labels_string(mmask: np.ndarray) -> np.ndarray:
         Image shaped output where each 'pixel' is a string.
     """
     labels = []
-    for i in range(mmask.shape[0]):
+    for i in range(rng):
         row = []
         for j in range(mmask.shape[1]):
             row.append(",".join(mmask[i, j].astype(str)))
@@ -82,27 +82,8 @@ def get_labels_string(mmask: np.ndarray) -> np.ndarray:
     labels = np.array(labels)
     return labels
 
-
-def find_wall_indices(labels: np.ndarray) -> np.ndarray:
-    """Save the indices of every pixel that is part of the walls.
-
-    Parameters
-    ----------
-    labels : np.ndarray
-        Output of get_labels_string, string reduced segmentation map.
-
-    Returns
-    -------
-    np.ndarray
-        Indices of each pixel in the image that belongs to a wall.
-    """
-    walls_x, walls_y = np.where(labels == "0.47058824,0.47058824,0.47058824,1.0")
-    walls = np.array([walls_x, walls_y])
-    return walls
-
-
-def find_non_wall_indices(labels: np.ndarray) -> np.ndarray:
-    """Save the indices of every pixel that isn't part of the walls
+def find_colour_indices(labels: np.ndarray, colour_string: str) -> np.ndarray:
+    """Save the indices of every pixel that isn't part of the specified colour
 
     Parameters
     ----------
@@ -112,11 +93,28 @@ def find_non_wall_indices(labels: np.ndarray) -> np.ndarray:
     Returns
     -------
     np.ndarray
-        Indices of each pixel in the image that doesn't belong to a wall.
+        Indices of each pixel in the image that doesn't belong to the specificied colour.
     """
-    other_x, other_y = np.where(labels != "0.47058824,0.47058824,0.47058824,1.0")
-    other = np.array([other_x, other_y])
-    return other
+    inds_x, inds_y = np.where(labels == colour_string)
+    inds = np.array([inds_x, inds_y])
+    return inds
+
+def find_not_colour_indices(labels: np.ndarray, colour_string: str) -> np.ndarray:
+    """Save the indices of every pixel that isn't part of the specified colour
+
+    Parameters
+    ----------
+    labels : np.ndarray
+        Output of get_labels_string, string reduced segmentation map.
+
+    Returns
+    -------
+    np.ndarray
+        Indices of each pixel in the image that doesn't belong to the specificied colour.
+    """
+    inds_x, inds_y = np.where(labels != colour_string)
+    inds = np.array([inds_x, inds_y])
+    return inds
 
 
 # Alternative method which takes longer:
