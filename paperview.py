@@ -130,9 +130,9 @@ if correct != 'y':
 print("Pipeline is running, please wait...")
 
 output, output_simple = pipeline(room_img_path, wallpaper_img_path)
-cv2.imwrite("output.png", output)
+cv2.imwrite("outputs/output.png", output)
 # cv2.imwrite("output-simple.png", output_simple)
-output_img = pil.open("output.png")
+output_img = pil.open("outputs/output.png")
 output_img.show()
 
 improve = input("Would you like to answer a question to attempt to help improve the output? (y/n): ")
@@ -155,9 +155,9 @@ else:
     print("Pipeline is running again, please wait...")
 
     improved_output, _ = pipeline(room_img_path, wallpaper_img_path, corners_input)
-    cv2.imwrite("improved-output.png", improved_output)
+    cv2.imwrite("outputs/improved-output.png", improved_output)
     # cv2.imwrite("output-simple.png", output_simple)
-    output_img = pil.open("improved-output.png")
+    output_img = pil.open("outputs/improved-output.png")
     output_img.show()
 
     print("Thank you for using PaperView. Your ouput has been saved.")
