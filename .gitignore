@@ -1,3 +1,4 @@
 images/outputs/*
 __pycache__/*
 test.ipynb
+outputs/*
