@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.cluster import DBSCAN
+import skspatial.objects as sks
 import PIL.Image as pil
 import cv2
 from matplotlib import pyplot as plt
@@ -314,10 +315,12 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
                 break
 
     new_geom = remove_duplicate_walls(geom)
+    new_geom_2 = []
 
     for cont in new_geom:
-        if cv2.contourArea(cont, True) < 100:
-            new_geom.remove(cont)
+        if cv2.contourArea(cont, True) > 100:
+            new_geom_2.append(cont)
+    new_geom = new_geom_2
 
     # Plot new contours
     for i in range(len(new_geom)):
@@ -351,3 +354,39 @@ def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray) -> np.n
                     cont[i][0] = corner
 
     return new_geom
+
+
+def find_floor_intersection(walls, floor, depth_map, corner_inds):
+    wall_map = np.zeros(depth_map.shape[:2])
+    wall_map[walls[0], walls[1]] = 1
+    floor_points = np.array([floor[0][::50], floor[1][::50], depth_map[floor[0][::50], floor[1][::50]]]).swapaxes(0, 1)
+    floor_plane = sks.Plane.best_fit(floor_points)
+    intersection_ys = []
+
+    for corner in corner_inds:
+        wall_map_corner = wall_map.copy()
+        wall_map_corner[:, corner] += 1
+        x_inds, y_inds = np.where(wall_map_corner == 2)
+
+        line_data = np.array([x_inds, y_inds, depth_map[x_inds, y_inds]]).swapaxes(0, 1)
+        line = sks.Line.best_fit(line_data)
+        intersection_ys.append(floor_plane.intersect_line(line)[0])
+
+    return intersection_ys
+
+
+def set_geom_corner_intersection(new_geom: np.ndarray, corner_inds: np.ndarray, intersection_ys: list):
+    new_geom_copy = new_geom.copy()
+    final_geom = []
+
+    for wall in new_geom_copy:
+        for c in range(len(corner_inds)):
+            inds_1 = np.where(wall[:, 0] == corner_inds[c])[0]
+
+            if len(inds_1) > 0:
+                inds_2 = np.argmax(wall[inds_1, 1])
+                ind = inds_1[inds_2]
+                wall[ind, 1] = intersection_ys[c]
+
+        final_geom.append(wall)
+    return np.array(final_geom)
