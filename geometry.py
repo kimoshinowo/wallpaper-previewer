@@ -318,7 +318,7 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
     new_geom_2 = []
 
     for cont in new_geom:
-        if cv2.contourArea(cont, True) > 100:
+        if cv2.contourArea(cont, True) > 500:
             new_geom_2.append(cont)
     new_geom = new_geom_2
 
