@@ -321,24 +321,25 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
 
     for cont in new_geom:
         if cv2.contourArea(cont, True) > 500:
-            # Remove any quadrilaterals with really sharp angles
-            angles = []
-            for i in range(len(cont)):
-                if i < (len(cont)-2):
-                    vec_1 = (cont[i+1][0]-cont[i][0],cont[i+1][1]-cont[i][1])
-                    vec_2 = (cont[i+2][0]-cont[i+1][0],cont[i+2][1]-cont[i+1][1])
-                    angle = np.arctan2(np.cross(vec_1,vec_2), np.dot(vec_1,vec_2)) 
-                elif i == (len(cont)-2):
-                    vec_1 = (cont[i+1][0]-cont[i][0],cont[i+1][1]-cont[i][1])
-                    vec_2 = (cont[0][0]-cont[i+1][0],cont[0][1]-cont[i+1][1])
-                    angle = np.arctan2(np.cross(vec_1,vec_2), np.dot(vec_1,vec_2)) 
-                elif i == (len(cont)-1):
-                    vec_1 = (cont[0][0]-cont[i][0],cont[0][1]-cont[i][1])
-                    vec_2 = (cont[1][0]-cont[0][0],cont[1][1]-cont[0][1])
-                    angle = np.arctan2(np.cross(vec_1,vec_2), np.dot(vec_1,vec_2)) 
-                angles.append(angle)
-            if abs(min(angles)) > 0.698 and abs(max(angles)) < 5.585:
-                new_geom_2.append(cont)
+            new_geom_2.append(cont)
+            # # Remove any quadrilaterals with really sharp angles
+            # angles = []
+            # for i in range(len(cont)):
+            #     if i < (len(cont)-2):
+            #         vec_1 = (cont[i+1][0]-cont[i][0],cont[i+1][1]-cont[i][1])
+            #         vec_2 = (cont[i+2][0]-cont[i+1][0],cont[i+2][1]-cont[i+1][1])
+            #         angle = np.arctan2(np.cross(vec_1,vec_2), np.dot(vec_1,vec_2)) 
+            #     elif i == (len(cont)-2):
+            #         vec_1 = (cont[i+1][0]-cont[i][0],cont[i+1][1]-cont[i][1])
+            #         vec_2 = (cont[0][0]-cont[i+1][0],cont[0][1]-cont[i+1][1])
+            #         angle = np.arctan2(np.cross(vec_1,vec_2), np.dot(vec_1,vec_2)) 
+            #     elif i == (len(cont)-1):
+            #         vec_1 = (cont[0][0]-cont[i][0],cont[0][1]-cont[i][1])
+            #         vec_2 = (cont[1][0]-cont[0][0],cont[1][1]-cont[0][1])
+            #         angle = np.arctan2(np.cross(vec_1,vec_2), np.dot(vec_1,vec_2)) 
+            #     angles.append(angle)
+            # if abs(min(angles)) >= 0.6109 and abs(max(angles)) <= 5.6723:
+            #     new_geom_2.append(cont)
                 
     new_geom = new_geom_2
 
