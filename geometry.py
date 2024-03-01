@@ -60,13 +60,15 @@ def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray, width: i
     all_corners = np.concatenate((hough_corners, harris_corners))
     min_samples = int(all_corners.size // 4)
 
-    if all_corners.size >= 0:
+    if all_corners.size > 0:
         corner_inds = cluster_corners(all_corners, min_samples, width)
 
         # if corner_inds.size == 0:
         #     all_corners = np.concatenate((hough_corners, hough_corners, harris_corners, harris_corners, harris_corners))
         #     min_samples = int(all_corners.size // 10)
         #     corner_inds = cluster_corners(all_corners, min_samples, width)
+    else:
+        corner_inds = np.array([]).astype(int)
 
     return corner_inds
 
