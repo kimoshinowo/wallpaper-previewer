@@ -3,6 +3,8 @@ import cv2
 import math
 import PIL.Image as pil
 from matplotlib import pyplot as plt
+from shapely.geometry import Polygon
+from operator import itemgetter
 
 
 def find_hypotenuse(wall_coords: np.ndarray) -> float:
@@ -69,27 +71,42 @@ def order_corner_points(wall_coords: np.ndarray) -> np.ndarray:
     np.ndarray
         Corner coordinates of the wall, in the required order.
     """
-    xs = []
-    # find 2 smallest x
+    # xs = []
+    # # find 2 smallest x
+    # for i in wall_coords:
+    #     xs.append(i[0])
+    # xs = np.array(xs)
+    # largest_xs = [0, 1, 2, 3]
+    # smallest_xs = np.argpartition(xs, 2)[:2]
+    # [largest_xs.remove(smallest_xs[i]) for i in range(2)]
+
+    # # of those, find biggest y and smallest y
+    # left_points = wall_coords[smallest_xs]
+    # tl = left_points[np.argmax(left_points[:, 1])]
+    # bl = left_points[np.argmin(left_points[:, 1])]
+
+    # # find biggest y and smallest y of the 2 largest x values
+    # largest_xs = np.array(largest_xs)
+    # right_points = wall_coords[largest_xs]
+    # tr = right_points[np.argmax(right_points[:, 1])]
+    # br = right_points[np.argmin(right_points[:, 1])]
+
+    # ordered_points = np.array([bl, tl, tr, br])
+
+    wall_coords = wall_coords.tolist()
+    shapely_poly = Polygon(wall_coords)
+    centre = shapely_poly.centroid
+    centre = [centre.x, centre.y]
+    angles = []
     for i in wall_coords:
-        xs.append(i[0])
-    xs = np.array(xs)
-    largest_xs = [0, 1, 2, 3]
-    smallest_xs = np.argpartition(xs, 2)[:2]
-    [largest_xs.remove(smallest_xs[i]) for i in range(2)]
+        vec_1 = (centre[0]-i[0], centre[1]-i[1])
+        vec_2 = (0, centre[1])
+        angle_rad = np.arctan2(np.cross(vec_1,vec_2), np.dot(vec_1,vec_2))
+        angle = (angle_rad * 180)/math.pi
+        angles.append([i, angle])
+    angles = sorted(angles, reverse=True, key=itemgetter(1))
 
-    # of those, find biggest y and smallest y
-    left_points = wall_coords[smallest_xs]
-    tl = left_points[np.argmax(left_points[:, 1])]
-    bl = left_points[np.argmin(left_points[:, 1])]
-
-    # find biggest y and smallest y of the 2 largest x values
-    largest_xs = np.array(largest_xs)
-    right_points = wall_coords[largest_xs]
-    tr = right_points[np.argmax(right_points[:, 1])]
-    br = right_points[np.argmin(right_points[:, 1])]
-
-    ordered_points = np.array([bl, tl, tr, br])
+    ordered_points = np.float32([angles[0][0], angles[1][0], angles[2][0], angles[3][0]])
 
     return ordered_points
 
