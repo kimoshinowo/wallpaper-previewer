@@ -321,6 +321,7 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
 
     for cont in new_geom:
         if cv2.contourArea(cont, True) > 500:
+            # Remove any quadrilaterals with really sharp angles
             angles = []
             for i in range(len(cont)):
                 if i < (len(cont)-2):
