@@ -15,6 +15,28 @@ import depth_estimation
 import geometry
 import transforms
 
+def depth_and_edge_corners(input_pil, input_cv2, walls, height, width, other):
+    # Depth estimation
+    depth_image = depth_estimation.estimate_depth(input_pil)
+
+    # Edge detection
+    edge_map = edge_detection.detect_edges(input_cv2)
+    segmented_edges = edge_detection.get_segmented_edges(edge_map, walls)
+
+    # Find corners
+    hough_img = edge_detection.hough_transform(segmented_edges, height, 50, 0.03, 0.02)
+    vertical_lines = edge_detection.get_vertical_lines(hough_img)
+    hough_colours = general_methods.get_labels_string(vertical_lines, vertical_lines.shape[0])
+    hough_corners = edge_detection.get_hough_corners(hough_colours)
+    mean_depth = depth_estimation.get_mean_depths(depth_image, other)
+    matrix = general_methods.get_matrix(mean_depth)
+    matrix_corners = depth_estimation.get_harris_corners(matrix)
+    harris_colours = general_methods.get_labels_string(matrix_corners, matrix_corners.shape[0])
+    _, harris_corners = np.where(harris_colours == "255,0,0")
+    corner_inds = geometry.find_corners(hough_corners, harris_corners, width)
+
+    return corner_inds
+
 def corner_detection(labels, height, width, input_cv2, walls, input_pil, other):
     ceiling_x, _ = np.where(labels == "0.47058824,0.47058824,0.3137255,1.0")
 
@@ -50,25 +72,11 @@ def corner_detection(labels, height, width, input_cv2, walls, input_pil, other):
         ceiling_colours = general_methods.get_labels_string(temp2, temp2.shape[0])
         _, ceiling_corners = np.where(ceiling_colours == "255.0,0.0,0.0")
         corner_inds = geometry.find_corners(ceiling_corners, ceiling_corners, width)
+
+        if corner_inds.size == 0:
+            corner_inds = depth_and_edge_corners(input_pil, input_cv2, walls, height, width, other)
     else:
-        # Depth estimation
-        depth_image = depth_estimation.estimate_depth(input_pil)
-
-        # Edge detection
-        edge_map = edge_detection.detect_edges(input_cv2)
-        segmented_edges = edge_detection.get_segmented_edges(edge_map, walls)
-
-        # Find corners
-        hough_img = edge_detection.hough_transform(segmented_edges, height, 50, 0.03, 0.02)
-        vertical_lines = edge_detection.get_vertical_lines(hough_img)
-        hough_colours = general_methods.get_labels_string(vertical_lines, vertical_lines.shape[0])
-        hough_corners = edge_detection.get_hough_corners(hough_colours)
-        mean_depth = depth_estimation.get_mean_depths(depth_image, other)
-        matrix = general_methods.get_matrix(mean_depth)
-        matrix_corners = depth_estimation.get_harris_corners(matrix)
-        harris_colours = general_methods.get_labels_string(matrix_corners, matrix_corners.shape[0])
-        _, harris_corners = np.where(harris_colours == "255,0,0")
-        corner_inds = geometry.find_corners(hough_corners, harris_corners, width)
+        corner_inds = depth_and_edge_corners(input_pil, input_cv2, walls, height, width, other)
     
     return corner_inds
 
