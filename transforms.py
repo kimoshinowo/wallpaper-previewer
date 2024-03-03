@@ -256,7 +256,7 @@ def get_transformed_wallpaper(
     return (result_1, result_2)
 
 
-def get_wall_mask(new_geom: list, height: int, width: int, walls: np.ndarray) -> np.ndarray:
+def get_wall_mask(new_geom: list, height: int, width: int, walls: np.ndarray) -> "tuple[np.ndarray, np.ndarray]":
     """Get mask of walls.
 
     Parameters
@@ -305,19 +305,23 @@ def get_wall_mask(new_geom: list, height: int, width: int, walls: np.ndarray) ->
     if len(geom_mask) > 0:
         # Combine masks by only taking the points where both masks overlap
         final_mask = np.zeros([height, width])
+        extra_mask = np.zeros([height, width])
 
         for i in range(height):
             for j in range(width):
                 if wall_mask[i, j] + geom_mask[i, j] == 2:
                     final_mask[i, j] = 1
+                if wall_mask[i, j] == 1 and geom_mask[i, j] == 0:
+                    extra_mask[i, j] = 1
     else:
         final_mask = wall_mask
+        extra_mask = np.array([])
 
-    return final_mask
+    return (final_mask, extra_mask)
 
 
 def combine_wallpaper_and_input(
-    input_cv2: np.ndarray, final_mask: np.ndarray, result_1: np.ndarray, result_2: np.ndarray, walls: np.ndarray
+    input_cv2: np.ndarray, final_mask: np.ndarray, extra_mask, result_1: np.ndarray, result_2: np.ndarray, walls: np.ndarray
 ) -> "tuple[np.ndarray, np.ndarray]":
     """Combine transformed wallpaper image with input room image using masks.
 
@@ -345,6 +349,8 @@ def combine_wallpaper_and_input(
 
     mask_other_x, mask_other_y = np.where(final_mask == 1)
     final_output[mask_other_x, mask_other_y] = result_1[mask_other_x, mask_other_y]
+    extra_mask_other_x, extra_mask_other_y = np.where(extra_mask == 1)
+    final_output[extra_mask_other_x, extra_mask_other_y] = result_2[extra_mask_other_x, extra_mask_other_y]
 
     final_output_2[walls[0], walls[1]] = result_2[walls[0], walls[1]]
 
