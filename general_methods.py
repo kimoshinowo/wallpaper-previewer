@@ -21,7 +21,7 @@ def import_and_resize(filename: str) -> pil.Image:
 
     input_img = pil.open(filename)
     input_img.thumbnail((1000, 1000))
-    input_img.save(filename)
+    input_img.save("images/outputs/intermediate-outputs/resized-input.png")
     return input_img
 
 
