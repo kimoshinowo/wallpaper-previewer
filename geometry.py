@@ -290,11 +290,11 @@ def remove_nested_geometry(geom):
             total = 0
             if i != j:
                 for c in range(len(geom[j])):
-                    t = cv2.pointPolygonTest(geom[i], tuple(geom[j][c]), False)
+                    t = cv2.pointPolygonTest(geom[i], tuple(geom[j][c].astype(float)), False)
                     if t == 1.0:
                         total += 1
             
-            if total >= 2:
+            if total >= 1:
                 nested.append(j)
                 break
     
@@ -343,22 +343,14 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
                 break
 
     new_geom = remove_duplicate_walls(geom)
-    new_geom = remove_nested_geometry(new_geom)
     new_geom_2 = []
 
     for cont in new_geom:
-        if cv2.contourArea(cont, True) > 500:
+        if cv2.contourArea(cont, True) > 1000:
             new_geom_2.append(cont)
                 
     new_geom = new_geom_2
 
-    # Plot new contours
-    for i in range(len(new_geom)):
-        data = np.append(new_geom[i], new_geom[i][0]).reshape(-1, 2)
-        plt.plot(np.array(data)[:, 0], -np.array(data)[:, 1])
-
-    plt.savefig("images/outputs/intermediate-outputs/final-contours.png")
-    plt.clf()
     return new_geom
 
 
@@ -401,6 +393,14 @@ def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray, width) 
                 break
         fixed_geom.append(cont)
     fixed_geom = np.array(fixed_geom)
+
+    # Plot new contours
+    for i in range(len(fixed_geom)):
+        data = np.append(fixed_geom[i], fixed_geom[i][0]).reshape(-1, 2)
+        plt.plot(np.array(data)[:, 0], -np.array(data)[:, 1])
+
+    plt.savefig("images/outputs/intermediate-outputs/final-contours.png")
+    plt.clf()
 
     return fixed_geom
 
