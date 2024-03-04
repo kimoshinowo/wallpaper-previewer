@@ -4,6 +4,7 @@ import skspatial.objects as sks
 import PIL.Image as pil
 import cv2
 from matplotlib import pyplot as plt
+import transforms
 
 def cluster_corners(all_corners: np.ndarray, min_samples: int, width: int) -> np.ndarray:
     """Find only most dense clusters for the corners
@@ -312,7 +313,6 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
             # if polygon has length of 4, keep it and break loop
             if len(convex_hull) == 4:
                 convex_hull = convex_hull.reshape((4, 2))
-                convex_hull = make_edges_parallel(convex_hull, width)
                 geom.append(convex_hull)
                 break
 
@@ -322,24 +322,6 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
     for cont in new_geom:
         if cv2.contourArea(cont, True) > 500:
             new_geom_2.append(cont)
-            # # Remove any quadrilaterals with really sharp angles
-            # angles = []
-            # for i in range(len(cont)):
-            #     if i < (len(cont)-2):
-            #         vec_1 = (cont[i+1][0]-cont[i][0],cont[i+1][1]-cont[i][1])
-            #         vec_2 = (cont[i+2][0]-cont[i+1][0],cont[i+2][1]-cont[i+1][1])
-            #         angle = np.arctan2(np.cross(vec_1,vec_2), np.dot(vec_1,vec_2)) 
-            #     elif i == (len(cont)-2):
-            #         vec_1 = (cont[i+1][0]-cont[i][0],cont[i+1][1]-cont[i][1])
-            #         vec_2 = (cont[0][0]-cont[i+1][0],cont[0][1]-cont[i+1][1])
-            #         angle = np.arctan2(np.cross(vec_1,vec_2), np.dot(vec_1,vec_2)) 
-            #     elif i == (len(cont)-1):
-            #         vec_1 = (cont[0][0]-cont[i][0],cont[0][1]-cont[i][1])
-            #         vec_2 = (cont[1][0]-cont[0][0],cont[1][1]-cont[0][1])
-            #         angle = np.arctan2(np.cross(vec_1,vec_2), np.dot(vec_1,vec_2)) 
-            #     angles.append(angle)
-            # if abs(min(angles)) >= 0.6109 and abs(max(angles)) <= 5.6723:
-            #     new_geom_2.append(cont)
                 
     new_geom = new_geom_2
 
@@ -353,7 +335,7 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
     return new_geom
 
 
-def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray) -> np.ndarray:
+def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray, width) -> np.ndarray:
     """!!!
 
     Parameters
@@ -368,13 +350,33 @@ def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray) -> np.n
     np.s
         _description_
     """
+    # for cont in new_geom:
+    #     for i in range(4):
+    #         for corner in corner_inds:
+    #             if np.abs(cont[i][0] - corner) < 10:
+    #                 cont[i][0] = corner
+    fixed_geom = []
     for cont in new_geom:
-        for i in range(4):
-            for corner in corner_inds:
-                if np.abs(cont[i][0] - corner) < 10:
-                    cont[i][0] = corner
+        cont = transforms.order_corner_points(cont)
+        print(cont)
+        left = [cont[0][0], cont[1][0]]
+        print(left)
+        right = [cont[2][0], cont[3][0]]
+        print(right)
+        for i in range(int(min(left)), -1, -1):
+            if i in corner_inds or i == 0:
+                cont[0][0] = i
+                cont[1][0] = i
+                break
+        for i in range(int(max(right)), width+1):
+            if i in corner_inds or i == width:
+                cont[2][0] = i
+                cont[3][0] = i
+                break
+        fixed_geom.append(cont)
+    fixed_geom = np.array(fixed_geom)
 
-    return new_geom
+    return fixed_geom
 
 
 def find_floor_intersection(walls, floor, depth_map, corner_inds):
