@@ -282,6 +282,31 @@ def remove_duplicate_walls(geom: list) -> list:
     return new_geom
 
 
+def remove_nested_geometry(geom):
+    nested = []
+
+    for i in range(len(geom)):
+        for j in range(len(geom)):
+            total = 0
+            if i != j:
+                for c in range(len(geom[j])):
+                    t = cv2.pointPolygonTest(geom[i], tuple(geom[j][c]), False)
+                    if t == 1.0:
+                        total += 1
+            
+            if total >= 2:
+                nested.append(j)
+                break
+    
+    nested = np.array(nested)
+    new_geom = geom.copy()
+
+    if len(nested) != 0:
+        new_geom = np.delete(new_geom, nested, axis=0)
+    
+    return new_geom
+
+
 def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
     """Estimate quadrilaterals from the polygons already found.
 
@@ -313,10 +338,12 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
             # if polygon has length of 4, keep it and break loop
             if len(convex_hull) == 4:
                 convex_hull = convex_hull.reshape((4, 2))
+                # convex_hull = make_edges_parallel(convex_hull, width)
                 geom.append(convex_hull)
                 break
 
     new_geom = remove_duplicate_walls(geom)
+    new_geom = remove_nested_geometry(new_geom)
     new_geom_2 = []
 
     for cont in new_geom:
@@ -355,6 +382,8 @@ def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray, width) 
     #         for corner in corner_inds:
     #             if np.abs(cont[i][0] - corner) < 10:
     #                 cont[i][0] = corner
+    
+    # return new_geom
     fixed_geom = []
     for cont in new_geom:
         cont = transforms.order_corner_points(cont)
