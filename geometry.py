@@ -358,11 +358,8 @@ def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray, width) 
     fixed_geom = []
     for cont in new_geom:
         cont = transforms.order_corner_points(cont)
-        print(cont)
         left = [cont[0][0], cont[1][0]]
-        print(left)
         right = [cont[2][0], cont[3][0]]
-        print(right)
         for i in range(int(min(left)), -1, -1):
             if i in corner_inds or i == 0:
                 cont[0][0] = i
