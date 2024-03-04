@@ -349,8 +349,8 @@ def combine_wallpaper_and_input(
 
     mask_other_x, mask_other_y = np.where(final_mask == 1)
     final_output[mask_other_x, mask_other_y] = result_1[mask_other_x, mask_other_y]
-    extra_mask_other_x, extra_mask_other_y = np.where(extra_mask == 1)
-    final_output[extra_mask_other_x, extra_mask_other_y] = result_2[extra_mask_other_x, extra_mask_other_y]
+    # extra_mask_other_x, extra_mask_other_y = np.where(extra_mask == 1)
+    # final_output[extra_mask_other_x, extra_mask_other_y] = result_2[extra_mask_other_x, extra_mask_other_y]
 
     final_output_2[walls[0], walls[1]] = result_2[walls[0], walls[1]]
 
