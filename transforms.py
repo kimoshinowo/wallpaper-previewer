@@ -92,7 +92,6 @@ def order_corner_points(wall_coords: np.ndarray) -> np.ndarray:
     # br = right_points[np.argmin(right_points[:, 1])]
 
     # ordered_points = np.array([bl, tl, tr, br])
-
     wall_coords = wall_coords.tolist()
     shapely_poly = Polygon(wall_coords)
     centre = shapely_poly.centroid
@@ -105,9 +104,14 @@ def order_corner_points(wall_coords: np.ndarray) -> np.ndarray:
         angle = (angle_rad * 180)/math.pi
         angles.append([i, angle])
     angles = sorted(angles, reverse=True, key=itemgetter(1))
-
-    ordered_points = np.float32([angles[0][0], angles[1][0], angles[2][0], angles[3][0]])
-
+    count = 0
+    for angle in angles:
+        if angle[1] > 90:
+            count += 1
+    if count >= 2:
+        ordered_points = np.float32([angles[1][0], angles[2][0], angles[3][0], angles[0][0]])
+    else:
+        ordered_points = np.float32([angles[0][0], angles[1][0], angles[2][0], angles[3][0]])
     return ordered_points
 
 
