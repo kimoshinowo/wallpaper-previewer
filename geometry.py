@@ -385,13 +385,24 @@ def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray, width) 
             if i in corner_inds or i == 0:
                 cont[0][0] = i
                 cont[1][0] = i
+                if abs(cont[0][1] - cont[1][1]) < 15:
+                    if cont[0][1] != np.amax(cont[:, 1]):
+                        cont[0][1] = np.amax(cont[:, 1])
+                    else:
+                        cont[1][1] = np.amin(cont[:, 1])
                 break
         for i in range(int(max(right)), width+1):
             if i in corner_inds or i == width:
                 cont[2][0] = i
                 cont[3][0] = i
+                if abs(cont[2][1] - cont[3][1]) < 15:
+                    if cont[2][1] != np.amax(cont[:, 1]):
+                        cont[3][1] = np.amax(cont[:, 1])
+                    else:
+                        cont[2][1] = np.amin(cont[:, 1])
                 break
         fixed_geom.append(cont)
+    
     fixed_geom = np.array(fixed_geom)
 
     # Plot new contours
