@@ -104,12 +104,20 @@ def order_corner_points(wall_coords: np.ndarray) -> np.ndarray:
         angle = (angle_rad * 180)/math.pi
         angles.append([i, angle])
     angles = sorted(angles, reverse=True, key=itemgetter(1))
-    count = 0
-    for angle in angles:
-        if angle[1] > 90:
-            count += 1
+
+    t = np.array(angles, dtype=object)
+    temp = t[:, 1].astype(float)
+    count = np.where(temp>= 90)[0].size
+    # count2 = len(set(np.where(temp>= 0)[0]).intersection(set(np.where(temp<= 90)[0])))
+    count2 = np.where(temp>= 0)[0].size
+
     if count >= 2:
         ordered_points = np.float32([angles[1][0], angles[2][0], angles[3][0], angles[0][0]])
+    elif count2 == 1:
+        if abs(180+angles[3][1]) < abs(angles[1][1]):
+            ordered_points = np.float32([angles[3][0], angles[0][0], angles[1][0], angles[2][0]])
+        else:
+            ordered_points = np.float32([angles[0][0], angles[1][0], angles[2][0], angles[3][0]])
     else:
         ordered_points = np.float32([angles[0][0], angles[1][0], angles[2][0], angles[3][0]])
     return ordered_points
