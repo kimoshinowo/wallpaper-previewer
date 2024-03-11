@@ -40,7 +40,7 @@ def depth_and_edge_corners(input_pil, input_cv2, walls, height, width, other):
 def corner_detection(labels, height, width, input_cv2, walls, input_pil, other):
     ceiling_x, _ = np.where(labels == "0.47058824,0.47058824,0.3137255,1.0")
 
-    if ceiling_x.size > (0.05 * (height * width)):
+    if ceiling_x.size > (0.01 * (height * width)):
         non_ceil_x, non_ceil_y = np.where((labels != "0.47058824,0.47058824,0.47058824,1.0") & (labels != "0.47058824,0.47058824,0.3137255,1.0"))
         non_ceil = np.array([non_ceil_x, non_ceil_y])
 
@@ -63,8 +63,8 @@ def corner_detection(labels, height, width, input_cv2, walls, input_pil, other):
 
         hough_img = edge_detection.hough_transform(edge_map, input_cv2.shape[0], 10, 0.001, 0.5)
         corners = depth_estimation.get_harris_corners(hough_img)
-        labels = general_methods.get_labels_string(corners, 40)
-        red = general_methods.find_colour_indices(labels, "255.0,0.0,0.0")
+        labels_red = general_methods.get_labels_string(corners, 40)
+        red = general_methods.find_colour_indices(labels_red, "255.0,0.0,0.0")
         
         temp2 = corners.copy()
         temp2[red[0], red[1]] = np.array([0, 0, 0], dtype=float)
@@ -82,8 +82,8 @@ def corner_detection(labels, height, width, input_cv2, walls, input_pil, other):
 
 def pipeline(filename, wallpaper_filename, corners = None):
     input_pil = general_methods.import_and_resize(filename)
-    input_img = general_methods.import_mx_image(filename)
-    input_cv2 = general_methods.import_cv2_image(filename)
+    input_img = general_methods.import_mx_image("images/outputs/intermediate-outputs/resized-input.png")
+    input_cv2 = general_methods.import_cv2_image("images/outputs/intermediate-outputs/resized-input.png")
     height = input_cv2.shape[0]
     width = input_cv2.shape[1]
     size = (width, height)
@@ -107,17 +107,19 @@ def pipeline(filename, wallpaper_filename, corners = None):
     contours = geometry.find_contours(only_walls)
     corner_adj_geom = geometry.find_walls(contours, corner_inds)
     new_geom = geometry.find_quadrilaterals(corner_adj_geom, width)
-    new_corner_geom = geometry.move_edges_to_corners(new_geom, corner_inds)
+    new_corner_geom = geometry.remove_nested_geometry(new_geom)
+    new_corner_geom = geometry.move_edges_to_corners(new_corner_geom, corner_inds, width)
 
     # Perspective transform
     wallpaper = general_methods.import_cv2_image(wallpaper_filename)
     result_1, result_2 = transforms.get_transformed_wallpaper(new_corner_geom, height, width, size, wallpaper)
 
     # Create final image
-    final_mask = transforms.get_wall_mask(new_corner_geom, height, width, walls)
-    final_output_1, final_output_2 = transforms.combine_wallpaper_and_input(input_cv2, final_mask, result_1, result_2, walls)
+    final_mask, extra_mask = transforms.get_wall_mask(new_corner_geom, height, width, walls)
+    final_output_1, final_output_2 = transforms.combine_wallpaper_and_input(input_cv2, final_mask, extra_mask, result_1, result_2, walls)
  
     return final_output_1, final_output_2
+
 
 room_img_path = input("Please enter the path to your room image: ")
 room_img = pil.open(room_img_path)
@@ -148,7 +150,7 @@ improve = input("Would you like to answer a question to attempt to help improve 
 if improve != 'y':
     print("Thank you for using PaperView. Your ouput has been saved.")
 else:
-    graph_img_fig = mpimg.imread(room_img_path)
+    graph_img_fig = mpimg.imread("images/outputs/intermediate-outputs/resized-input.png")
     plt.imshow(graph_img_fig)
     plt.xticks(list(range(0, output.shape[1], 50)), rotation = -45)
     plt.grid(color = 'red')
