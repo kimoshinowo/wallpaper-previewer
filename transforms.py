@@ -313,11 +313,11 @@ def get_wall_mask(new_geom: list, height: int, width: int, walls: np.ndarray) ->
     # Create mask of walls from segmentation map by setting the walls to 1 and everything else to 0
     wall_mask = np.zeros([height, width])
     wall_mask[walls[0], walls[1]] = 1
+    extra_mask = np.zeros([height, width])
 
     if len(geom_mask) > 0:
         # Combine masks by only taking the points where both masks overlap
         final_mask = np.zeros([height, width])
-        extra_mask = np.zeros([height, width])
 
         for i in range(height):
             for j in range(width):
@@ -327,7 +327,6 @@ def get_wall_mask(new_geom: list, height: int, width: int, walls: np.ndarray) ->
                     extra_mask[i, j] = 1
     else:
         final_mask = wall_mask
-        extra_mask = np.array([])
 
     return (final_mask, extra_mask)
 
@@ -361,8 +360,8 @@ def combine_wallpaper_and_input(
 
     mask_other_x, mask_other_y = np.where(final_mask == 1)
     final_output[mask_other_x, mask_other_y] = result_1[mask_other_x, mask_other_y]
-    # extra_mask_other_x, extra_mask_other_y = np.where(extra_mask == 1)
-    # final_output[extra_mask_other_x, extra_mask_other_y] = result_2[extra_mask_other_x, extra_mask_other_y]
+    extra_mask_other_x, extra_mask_other_y = np.where(extra_mask == 1)
+    final_output[extra_mask_other_x, extra_mask_other_y] = result_2[extra_mask_other_x, extra_mask_other_y]
 
     final_output_2[walls[0], walls[1]] = result_2[walls[0], walls[1]]
 
