@@ -429,8 +429,9 @@ def find_floor_intersection(walls, floor, depth_map, corner_inds):
         x_inds, y_inds = np.where(wall_map_corner == 2)
 
         line_data = np.array([x_inds, y_inds, depth_map[x_inds, y_inds]]).swapaxes(0, 1)
-        line = sks.Line.best_fit(line_data)
-        intersection_ys.append(floor_plane.intersect_line(line)[0])
+        if line_data.size != 0:
+            line = sks.Line.best_fit(line_data)
+            intersection_ys.append(floor_plane.intersect_line(line)[0])
 
     return intersection_ys
 
