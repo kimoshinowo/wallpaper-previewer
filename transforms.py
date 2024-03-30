@@ -323,8 +323,8 @@ def get_wall_mask(new_geom: list, height: int, width: int, walls: np.ndarray) ->
             for j in range(width):
                 if wall_mask[i, j] + geom_mask[i, j] == 2:
                     final_mask[i, j] = 1
-                if wall_mask[i, j] == 1 and geom_mask[i, j] == 0:
-                    extra_mask[i, j] = 1
+                # if wall_mask[i, j] == 1 and geom_mask[i, j] == 0:
+                #     extra_mask[i, j] = 1
     else:
         final_mask = wall_mask
 
