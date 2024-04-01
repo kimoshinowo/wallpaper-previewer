@@ -304,6 +304,14 @@ def remove_nested_geometry(geom):
     if len(nested) != 0:
         new_geom = np.delete(new_geom, nested, axis=0)
     
+    # Plot new contours
+    for i in range(len(new_geom)):
+        data = np.append(new_geom[i], new_geom[i][0]).reshape(-1, 2)
+        plt.plot(np.array(data)[:, 0], -np.array(data)[:, 1])
+
+    plt.savefig("images/outputs/intermediate-outputs/quads-contours.png")
+    plt.clf()
+
     return new_geom
 
 
