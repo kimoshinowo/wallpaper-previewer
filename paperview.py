@@ -94,7 +94,7 @@ def pipeline(filename, wallpaper_filename, corners = None):
     labels = general_methods.get_labels_string(mmask, mmask.shape[0])
     walls = general_methods.find_colour_indices(labels, "0.47058824,0.47058824,0.47058824,1.0")
     other = general_methods.find_not_colour_indices(labels, "0.47058824,0.47058824,0.47058824,1.0")
-    segmented_input = semantic_segmentation.remove_inds(input_img, [other], [0, 0, 0])
+    segmented_input = semantic_segmentation.remove_inds(width, height, other)
 
     if corners is None:
         corner_inds = corner_detection(labels, height, width, input_cv2, walls, input_pil, other)
