@@ -4,3 +4,4 @@ test.ipynb
 outputs/*
 data-collection/outputs/*
 images/seg-images*
+data-collection/user-eval*
