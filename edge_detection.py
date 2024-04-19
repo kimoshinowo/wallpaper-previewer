@@ -63,8 +63,12 @@ def hough_transform(image: np.ndarray, height: int, threshold: int, minLineLengt
         Image on which to perform the hough transform.
     height : int
         The height of the image on which to perform the hough transform.
-    width : int
-        The width of the image on which to perform the hough transform.
+    threshold : int
+        Threshold value for the Hough transform
+    minLineLengthPerc : float
+        The minimum allowed length of line for the Hough transform.
+    maxLineGapPerc : float
+        The maximum allowed gap between lines for joining them during the Hough transform.
 
     Returns
     -------
