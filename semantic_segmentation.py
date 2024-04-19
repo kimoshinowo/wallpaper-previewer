@@ -49,17 +49,22 @@ def get_segementation(
     return mmask
 
 
-def remove_inds(width, height, inds) -> np.ndarray:
-    """Create a wall mask by creating a white image and setting the indices of everything but the walls to black.
+def remove_inds(width: int, height: int, inds: np.ndarray) -> np.ndarray:
+    """Create a mask by creating a white image and setting the indices of the specified area to black.
 
     Parameters
     ----------
-    !!!
+    width : int
+        The width of the original input image.
+    height : int
+        The height of the original input image.
+    inds : np.ndarray
+        The indices of the area to be turned black.
 
     Returns
     -------
     pil.Image
-        The input image with everything except the walls set to black.
+        A white image with the specified area set to black.
     """
     img = np.ones((height, width, 3))
     img = np.where(img==1, 255, img)

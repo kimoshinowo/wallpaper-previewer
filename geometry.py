@@ -7,21 +7,21 @@ from matplotlib import pyplot as plt
 import transforms
 
 def cluster_corners(all_corners: np.ndarray, min_samples: int, width: int) -> np.ndarray:
-    """Find only most dense clusters for the corners
+    """Find only most dense clusters for the corners.
 
     Parameters
     ----------
     all_corners : np.ndarray
-        List of all possible corner points
+        List of all possible corner points.
     min_samples : int
-        Minimum number of samples for clustering
+        Minimum number of samples for clustering.
     width : int
-        Width of the image
+        Width of the image.
 
     Returns
     -------
     np.ndarray
-        Indices of the corner points
+        Indices of the corner points.
     """
     corner_inds = []
 
@@ -44,7 +44,7 @@ def cluster_corners(all_corners: np.ndarray, min_samples: int, width: int) -> np
 
 
 def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray, width: int) -> np.ndarray:
-    """Performs clusting on the hough and harris corners to find likely room corners.
+    """Performs clustering on the hough and harris corners to find likely room corners.
 
     Parameters
     ----------
@@ -52,6 +52,8 @@ def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray, width: i
         Image column indices of edges found by hough transform.
     harris_corners : np.ndarray
         Image column indices of edge found by harris corner detection.
+    width : int
+        The width of the image.
 
     Returns
     -------
@@ -63,11 +65,6 @@ def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray, width: i
 
     if all_corners.size > 0:
         corner_inds = cluster_corners(all_corners, min_samples, width)
-
-        # if corner_inds.size == 0:
-        #     all_corners = np.concatenate((hough_corners, hough_corners, harris_corners, harris_corners, harris_corners))
-        #     min_samples = int(all_corners.size // 10)
-        #     corner_inds = cluster_corners(all_corners, min_samples, width)
     else:
         corner_inds = np.array([]).astype(int)
 
@@ -115,7 +112,7 @@ def find_contours(only_walls: np.ndarray) -> np.ndarray:
     Parameters
     ----------
     only_walls : np.ndarray
-        Output of create_wall_corner_map.
+        Image with white wall regions and black non-walls and wall corners.
 
     Returns
     -------
@@ -182,74 +179,6 @@ def find_walls(contours: np.ndarray, corner_inds: np.ndarray) -> list:
     return corner_adj_geom
 
 
-def make_edges_parallel(convex_hull: np.ndarray, width: int) -> np.ndarray:
-    """Make the vertical edges of the polygon parallel.
-
-    Parameters
-    ----------
-    convex_hull : np.ndarray
-        Corner points of the polygon.
-    width : int
-        Width of the input image.
-
-    Returns
-    -------
-    np.ndarray
-        Corner points of the polygon.
-    """
-    temp_0 = convex_hull[0][0]
-    temp_1 = convex_hull[1][0]
-    temp_2 = convex_hull[2][0]
-    temp_3 = convex_hull[3][0]
-    biggest, smallest = [], []
-
-    # For each corner, if the horizontal difference between it and the corner it's compared to is less than
-    # 20% of the width of the picture, then set them to be the same
-    for ind1 in range(0, 4):
-        for ind2 in range(0, 4):
-            if (
-                abs(convex_hull[ind1][0] - convex_hull[ind2][0])
-                <= (0.2 * width)
-            ) and (convex_hull[ind1][0] != convex_hull[ind2][0]):
-                # save both the largest and smallest of the two points
-                biggest.append(
-                    max(convex_hull[ind1][0], convex_hull[ind2][0])
-                )
-                smallest.append(
-                    min(convex_hull[ind1][0], convex_hull[ind2][0])
-                )
-                # Temporarily set to the largest of the two points
-                convex_hull[ind1][0] = biggest[-1]
-                convex_hull[ind2][0] = biggest[-1]
-
-    count = 0
-    left = set()
-
-    for x in range(0, 4):
-        for y in range(0, 4):
-            if abs(convex_hull[x][0] - convex_hull[y][0]) <= 20:
-                count += 1
-            if (
-                convex_hull[x][0] < convex_hull[y][0]
-            ):  # find which is the left side of the wall
-                left.add(x)
-
-    # if a point is on the left, set it to the min of the two points rather than the max
-    if len(smallest) > 0:
-        for x in range(0, 4):
-            if x in left and convex_hull[x][0] in biggest:
-                convex_hull[x][0] = min(smallest)
-
-    # if all 4 points have been set to the same x-value, revert the change
-    if count > 8:
-        convex_hull[0][0] = temp_0
-        convex_hull[1][0] = temp_1
-        convex_hull[2][0] = temp_2
-        convex_hull[3][0] = temp_3
-
-    return convex_hull
-
-
 def remove_duplicate_walls(geom: list) -> list:
     """Remove any duplicate walls.
 
@@ -282,7 +211,19 @@ def remove_duplicate_walls(geom: list) -> list:
     return new_geom
 
 
-def remove_nested_geometry(geom):
+def remove_nested_geometry(geom: list) -> list:
+    """Removes any polygon which has a point inside another polygon in the list.
+
+    Parameters
+    ----------
+    geom : list
+        List of walls.
+
+    Returns
+    -------
+    list
+        List of walls with any nested geometry removed.
+    """
     nested = []
 
     for i in range(len(geom)):
@@ -315,20 +256,18 @@ def remove_nested_geometry(geom):
     return new_geom
 
 
-def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
+def find_quadrilaterals(corner_adj_geom: list) -> list:
     """Estimate quadrilaterals from the polygons already found.
 
     Parameters
     ----------
     corner_adj_geom : list
-        Contours which are adjacent to the esimated wall corners.
-    width : int
-        Width of the input image.
+        Current list of walls.
 
     Returns
     -------
     list
-        List of walls.
+        New list of quadrilateral walls.
     """
     geom = []
 
@@ -346,7 +285,6 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
             # if polygon has length of 4, keep it and break loop
             if len(convex_hull) == 4:
                 convex_hull = convex_hull.reshape((4, 2))
-                # convex_hull = make_edges_parallel(convex_hull, width)
                 geom.append(convex_hull)
                 break
 
@@ -362,28 +300,24 @@ def find_quadrilaterals(corner_adj_geom: list, width: int) -> list:
     return new_geom
 
 
-def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray, width) -> np.ndarray:
-    """!!!
+def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray, width: int) -> np.ndarray:
+    """Move the vertical edges of the wall geometry to the identified corner points of the room.
 
     Parameters
     ----------
     new_geom : np.ndarray
-        _description_
+        Current list of walls.
     corner_inds : np.ndarray
-        _description_
+        List of corner points of the room.
+    width : int
+        The width of the input image.
 
     Returns
     -------
-    np.s
-        _description_
+    np.ndarray
+        New list of walls with edges on the room corners.
+        
     """
-    # for cont in new_geom:
-    #     for i in range(4):
-    #         for corner in corner_inds:
-    #             if np.abs(cont[i][0] - corner) < 10:
-    #                 cont[i][0] = corner
-    
-    # return new_geom
     fixed_geom = []
     for cont in new_geom:
         cont = transforms.order_corner_points(cont)
@@ -424,7 +358,25 @@ def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray, width) 
     return fixed_geom
 
 
-def find_floor_intersection(walls, floor, depth_map, corner_inds):
+def find_floor_intersection(walls: np.ndarray, floor: np.ndarray, depth_map: np.ndarray, corner_inds: np.ndarray) -> list:
+    """Estimate the y-values of the coordinates where the corners of the room intersect with the floor.
+
+    Parameters
+    ----------
+    walls : np.ndarray
+        Array of pixel indices that are classified as walls.
+    floor : np.ndarray
+        Array of pixel indices that are classified as walls.
+    depth_map : np.ndarray
+        The estimated depth map of the input image.
+    corner_inds : np.ndarray
+        Array of x-coordinates of identified corners.
+
+    Returns
+    -------
+    list
+        Array of corner-floor intersection y-values.
+    """
     wall_map = np.zeros(depth_map.shape[:2])
     wall_map[walls[0], walls[1]] = 1
     floor_points = np.array([floor[0][::50], floor[1][::50], depth_map[floor[0][::50], floor[1][::50]]]).swapaxes(0, 1)
@@ -444,7 +396,23 @@ def find_floor_intersection(walls, floor, depth_map, corner_inds):
     return intersection_ys
 
 
-def set_geom_corner_intersection(new_geom: np.ndarray, corner_inds: np.ndarray, intersection_ys: list):
+def set_geom_corner_intersection(new_geom: np.ndarray, corner_inds: np.ndarray, intersection_ys: list) -> list:
+    """Amend the wall geometry to use the identified corner-floor intersection points.
+
+    Parameters
+    ----------
+    new_geom : np.ndarray
+        List of walls.
+    corner_inds : np.ndarray
+        Array of x-coordinates of identified corners.
+    intersection_ys : list
+        Array of corner-floor intersection y-values.
+
+    Returns
+    -------
+    list
+        New list of walls.
+    """
     new_geom_copy = new_geom.copy()
     final_geom = []
 
@@ -458,4 +426,5 @@ def set_geom_corner_intersection(new_geom: np.ndarray, corner_inds: np.ndarray, 
                 wall[ind, 1] = intersection_ys[c]
 
         final_geom.append(wall)
+
     return np.array(final_geom)

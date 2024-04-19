@@ -102,6 +102,7 @@ def find_colour_indices(labels: np.ndarray, colour_string: str) -> np.ndarray:
     inds = np.array([inds_x, inds_y])
     return inds
 
+
 def find_not_colour_indices(labels: np.ndarray, colour_string: str) -> np.ndarray:
     """Save the indices of every pixel that isn't the specified colour.
 
