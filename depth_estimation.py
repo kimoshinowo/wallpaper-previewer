@@ -9,6 +9,7 @@ import PIL.Image as pil
 
 def estimate_depth(image: pil.Image) -> pil.Image:
     """Performs monocular depth estimation on an rgb image.
+    Implemented as per pre-trained model instructions https://huggingface.co/vinvino02/glpn-nyu
 
     Parameters
     ----------
@@ -68,16 +69,17 @@ def get_mean_depths(depth_image: pil.Image, other: np.ndarray) -> np.ndarray:
     test_depth[other[0], other[1]] = np.nan
 
     mean_depth = np.nanmean(test_depth, axis=0)
-    # Smooth using savgol filter
+    
     try:
         window_size = np.round(len(mean_depth)/20, 0).astype(int)
 
         if window_size % 2 == 0:
             window_size += 1
-
+        
+        # Smooth using savgol filter
         mean_depth = savgol_filter(
             mean_depth, window_size, 3
-        )  # window size 51, polynomial order 3
+        )
     except Exception:
         mean_depth = np.nanmean(test_depth, axis=0)
 
@@ -85,24 +87,24 @@ def get_mean_depths(depth_image: pil.Image, other: np.ndarray) -> np.ndarray:
 
 
 def get_harris_corners(matrix: np.ndarray) -> np.ndarray:
-    """Performs and plots harris corner detection on the minimised mean depth per column of the estimated depth map.
+    """Performs and plots harris corner detection.
 
     Parameters
     ----------
     matrix : np.ndarray
-        Minimised array of mean column-wise depth.
+        Array to perform corner detection on.
 
     Returns
     -------
     np.ndarray
-        A matrix containing the mean depth line graph with corner points highlighted.
+        A matrix containing the input with corner points highlighted.
     """
     operatedImage = np.float32(matrix)
     operatedImage = cv2.cvtColor(operatedImage, cv2.COLOR_BGR2GRAY)
     operatedImage = np.float32(operatedImage)
 
     dest = cv2.cornerHarris(operatedImage, 30, 5, 0.07)
-    dest = cv2.dilate(dest, None)  # Results are marked through the dilated corners
+    dest = cv2.dilate(dest, None)
 
     # Reverting back to the original image, with optimal threshold value
     matrix[dest > 0.01 * dest.max()] = [255, 0, 0]
