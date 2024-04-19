@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import PIL.Image as pil
 from matplotlib import pyplot as plt
-from statistics import mean
 
 
 def detect_edges(image: np.ndarray) -> pil.Image:
