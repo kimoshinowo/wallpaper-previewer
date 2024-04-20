@@ -23,7 +23,8 @@ def depth_and_edge_corners(
     width: int,
     other: np.ndarray
 ) -> np.ndarray:
-    """Find corners using depth estimation and edge detection methods.
+    """
+    Find corners using depth estimation and edge detection methods.
 
     Parameters
     ----------
@@ -76,7 +77,8 @@ def corner_detection(
     input_pil: pil.Image,
     other: np.ndarray
 ) -> np.ndarray:
-    """Find corners of the room from the input image.
+    """
+    Find corners of the room from the input image.
 
     Parameters
     ----------
@@ -148,7 +150,8 @@ def pipeline(
     wallpaper_filename: str,
     corners: list = None
 ) -> "tuple[np.ndarray, np.ndarray]":
-        """Find corners of the room from the input image.
+    """
+    Find corners of the room from the input image.
 
     Parameters
     ----------

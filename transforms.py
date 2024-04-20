@@ -8,7 +8,8 @@ from operator import itemgetter
 
 
 def find_hypotenuse(wall_coords: np.ndarray) -> float:
-    """Find length of the horizontal edge of the wall.
+    """
+    Find length of the horizontal edge of the wall.
 
     Parameters
     ----------
@@ -34,7 +35,8 @@ def find_hypotenuse(wall_coords: np.ndarray) -> float:
 
 
 def find_wall_height(wall_coords: np.ndarray) -> int:
-    """Find the height of the wall (on longest edge).
+    """
+    Find the height of the wall (on longest edge).
 
     Parameters
     ----------
@@ -59,7 +61,8 @@ def find_wall_height(wall_coords: np.ndarray) -> int:
 
 
 def order_corner_points(wall_coords: np.ndarray) -> np.ndarray:
-    """_summary_
+    """
+    Order the corner points of a quadrilateral going clockwise from the bottom left.
 
     Parameters
     ----------
@@ -102,9 +105,13 @@ def order_corner_points(wall_coords: np.ndarray) -> np.ndarray:
 
 
 def crop_wallpaper(
-    height: int, width: float, repeat_div: int, temp_tiled: np.ndarray
+    height: int,
+    width: float,
+    repeat_div: int,
+    temp_tiled: np.ndarray
 ) -> np.ndarray:
-    """Crop the tiled wallpaper image.
+    """
+    Crop the tiled wallpaper image.
 
     Parameters
     ----------
@@ -144,7 +151,8 @@ def crop_wallpaper(
 
 
 def get_corners(tiled: np.ndarray) -> np.ndarray:
-    """Gets an array containing the four corner points of the tiled wallpaper image.
+    """
+    Gets an array containing the four corner points of the tiled wallpaper image.
 
     Parameters
     ----------
@@ -169,9 +177,14 @@ def get_corners(tiled: np.ndarray) -> np.ndarray:
 
 
 def get_transformed_wallpaper(
-    new_geom: list, height: int, width: int, size: tuple, wallpaper: np.ndarray
+    new_geom: list,
+    height: int,
+    width: int,
+    size: tuple,
+    wallpaper: np.ndarray
 ) -> "tuple[np.ndarray, np.ndarray]":
-    """Create a wallpaper image where each wall is transformed to the correct size and shape.
+    """
+    Create a wallpaper image where each wall is transformed to the correct size and shape.
 
     Parameters
     ----------
@@ -246,8 +259,14 @@ def get_transformed_wallpaper(
     return (result_1, result_2)
 
 
-def get_wall_mask(new_geom: list, height: int, width: int, walls: np.ndarray) -> "tuple[np.ndarray, np.ndarray]":
-    """Get mask of walls.
+def get_wall_mask(
+    new_geom: list,
+    height: int,
+    width: int,
+    walls: np.ndarray
+) -> "tuple[np.ndarray, np.ndarray]":
+    """
+    Get mask of walls.
 
     Parameters
     ----------
@@ -311,9 +330,15 @@ def get_wall_mask(new_geom: list, height: int, width: int, walls: np.ndarray) ->
 
 
 def combine_wallpaper_and_input(
-    input_cv2: np.ndarray, final_mask: np.ndarray, extra_mask, result_1: np.ndarray, result_2: np.ndarray, walls: np.ndarray
+    input_cv2: np.ndarray,
+    final_mask: np.ndarray,
+    extra_mask: np.ndarray,
+    result_1: np.ndarray,
+    result_2: np.ndarray,
+    walls: np.ndarray
 ) -> "tuple[np.ndarray, np.ndarray]":
-    """Combine transformed wallpaper image with input room image using masks.
+    """
+    Combine transformed wallpaper image with input room image using masks.
 
     Parameters
     ----------

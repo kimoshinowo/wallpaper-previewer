@@ -8,7 +8,8 @@ ctx = mx.cpu(0)  # using cpu
 
 
 def get_pretrained_model() -> gluoncv.model_zoo.deeplabv3.DeepLabV3:
-    """Returns the pretrained deeplabV3 semantic segmentation model.
+    """
+    Returns the pretrained deeplabV3 semantic segmentation model.
 
     Returns
     -------
@@ -20,9 +21,11 @@ def get_pretrained_model() -> gluoncv.model_zoo.deeplabv3.DeepLabV3:
 
 
 def get_segementation(
-    input_img: np.ndarray, seg_model: gluoncv.model_zoo.deeplabv3.DeepLabV3
+    input_img: np.ndarray,
+    seg_model: gluoncv.model_zoo.deeplabv3.DeepLabV3
 ) -> pil.Image:
-    """Performs semantic segmentation on the input image using the provided model.
+    """
+    Performs semantic segmentation on the input image using the provided model.
 
     Parameters
     ----------
@@ -49,8 +52,13 @@ def get_segementation(
     return mmask
 
 
-def remove_inds(width: int, height: int, inds: np.ndarray) -> np.ndarray:
-    """Create a mask by creating a white image and setting the indices of the specified area to black.
+def remove_inds(
+    width: int,
+    height: int,
+    inds: np.ndarray
+) -> np.ndarray:
+    """
+    Create a mask by creating a white image and setting the indices of the specified area to black.
 
     Parameters
     ----------

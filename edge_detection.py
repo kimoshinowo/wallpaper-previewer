@@ -5,7 +5,8 @@ from matplotlib import pyplot as plt
 
 
 def detect_edges(image: np.ndarray) -> pil.Image:
-    """Implements canny edge detection and required image preprocessing.
+    """
+    Implements canny edge detection and required image preprocessing.
 
     Parameters
     ----------
@@ -27,7 +28,8 @@ def detect_edges(image: np.ndarray) -> pil.Image:
 
 
 def get_segmented_edges(edge_map: pil.Image, walls: np.ndarray) -> np.ndarray:
-    """Show only those edges which fall within wall regions.
+    """
+    Show only those edges which fall within wall regions.
 
     Parameters
     ----------
@@ -52,8 +54,15 @@ def get_segmented_edges(edge_map: pil.Image, walls: np.ndarray) -> np.ndarray:
     return segmented_edges
 
 
-def hough_transform(image: np.ndarray, height: int, threshold: int, minLineLengthPerc: float, maxLineGapPerc: float) -> np.ndarray:
-    """Performs the hough transform.
+def hough_transform(
+    image: np.ndarray,
+    height: int,
+    threshold: int,
+    minLineLengthPerc: float,
+    maxLineGapPerc: float
+) -> np.ndarray:
+    """
+    Performs the hough transform.
     Adapted from: https://www.geeksforgeeks.org/line-detection-python-opencv-houghline-method/
 
     Parameters
@@ -104,7 +113,8 @@ def hough_transform(image: np.ndarray, height: int, threshold: int, minLineLengt
 
 
 def get_vertical_lines(hough_img: np.ndarray) -> np.ndarray:
-    """Get vertical lines only.
+    """
+    Get vertical lines only.
     Adapted from: https://www.youtube.com/watch?v=veoz_46gOkc
 
     Parameters
@@ -126,7 +136,8 @@ def get_vertical_lines(hough_img: np.ndarray) -> np.ndarray:
 
 
 def get_hough_corners(colours: np.ndarray) -> np.ndarray:
-    """Find image column indices of hough transform lines.
+    """
+    Find image column indices of hough transform lines.
 
     Parameters
     ----------
