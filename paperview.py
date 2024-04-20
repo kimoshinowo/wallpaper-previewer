@@ -15,7 +15,36 @@ import depth_estimation
 import geometry
 import transforms
 
-def depth_and_edge_corners(input_pil, input_cv2, walls, height, width, other):
+def depth_and_edge_corners(
+    input_pil: pil.Image,
+    input_cv2: np.ndarray,
+    walls:np.ndarray,
+    height: int,
+    width: int,
+    other: np.ndarray
+) -> np.ndarray:
+    """Find corners using depth estimation and edge detection methods.
+
+    Parameters
+    ----------
+    input_pil : pil.Image
+        Input image in PIL format.
+    input_cv2 : np.ndarray
+        Input image in cv2 compatible format.
+    walls : np.ndarray
+        Indices of the pixels labelled as walls.
+    height : int
+        Height of the input image.
+    width : int
+        Width of the input image.
+    other : np.ndarray
+        Indices of the pixels of everything not labelled as walls.
+
+    Returns
+    -------
+    np.ndarray
+        Array containing the x-values of the room corners.
+    """
     # Depth estimation
     depth_image = depth_estimation.estimate_depth(input_pil)
 
@@ -37,7 +66,40 @@ def depth_and_edge_corners(input_pil, input_cv2, walls, height, width, other):
 
     return corner_inds
 
-def corner_detection(labels, height, width, input_cv2, walls, input_pil, other):
+
+def corner_detection(
+    labels: np.ndarray,
+    height: int,
+    width: int,
+    input_cv2: np.ndarray,
+    walls: np.ndarray,
+    input_pil: pil.Image,
+    other: np.ndarray
+) -> np.ndarray:
+    """Find corners of the room from the input image.
+
+    Parameters
+    ----------
+    labels : np.ndarray
+        Image shaped array where each 'pixel' is a string.
+    height : int
+        Height of the input image.
+    width : int
+        Width of the input image.
+    input_cv2 : np.ndarray
+        Input image in cv2 compatible format.
+    walls : np.ndarray
+        Indices of the pixels labelled as walls.
+    input_pil : pil.Image
+        Input image in PIL format.
+    other : np.ndarray
+        Indices of the pixels of everything not labelled as walls.
+
+    Returns
+    -------
+    np.ndarray
+        Array containing the x-values of the room corners.
+    """
     ceiling_x, _ = np.where(labels == "0.47058824,0.47058824,0.3137255,1.0")
 
     if ceiling_x.size > (0.01 * (height * width)):
@@ -80,7 +142,28 @@ def corner_detection(labels, height, width, input_cv2, walls, input_pil, other):
     
     return corner_inds
 
-def pipeline(filename, wallpaper_filename, corners = None):
+
+def pipeline(
+    filename: str,
+    wallpaper_filename: str,
+    corners: list = None
+) -> "tuple[np.ndarray, np.ndarray]":
+        """Find corners of the room from the input image.
+
+    Parameters
+    ----------
+    filename : str
+        The filename of the input room image.
+    wallpaper_fiilename : str
+        The filename of the wallpaper sample image.
+    corners : list, optional
+        List of corner values.
+
+    Returns
+    -------
+    tuple[np.ndarray, np.ndarray]
+        Final pipeline output images with wallpaper 'on' the walls.
+    """
     input_pil = general_methods.import_and_resize(filename)
     input_img = general_methods.import_mx_image("images/outputs/intermediate-outputs/resized-input.png")
     input_cv2 = general_methods.import_cv2_image("images/outputs/intermediate-outputs/resized-input.png")
@@ -121,6 +204,7 @@ def pipeline(filename, wallpaper_filename, corners = None):
     return final_output_1, final_output_2
 
 
+# User interface
 room_img_path = input("Please enter the path to your room image: ")
 room_img = pil.open(room_img_path)
 room_img.show()
@@ -141,9 +225,11 @@ print("Pipeline is running, please wait...")
 
 output, output_simple = pipeline(room_img_path, wallpaper_img_path)
 cv2.imwrite("outputs/output.png", output)
-# cv2.imwrite("output-simple.png", output_simple)
+cv2.imwrite("outputs/output-simple.png", output_simple)
 output_img = pil.open("outputs/output.png")
+output_img_simple = pil.open("outputs/output-simple.png")
 output_img.show()
+output_img_simple.show()
 
 improve = input("Would you like to answer a question to attempt to help improve the output? (y/n): ")
 
@@ -166,7 +252,6 @@ else:
 
     improved_output, _ = pipeline(room_img_path, wallpaper_img_path, corners_input)
     cv2.imwrite("outputs/improved-output.png", improved_output)
-    # cv2.imwrite("output-simple.png", output_simple)
     output_img = pil.open("outputs/improved-output.png")
     output_img.show()
 
