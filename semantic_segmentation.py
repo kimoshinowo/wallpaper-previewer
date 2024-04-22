@@ -23,7 +23,7 @@ def get_pretrained_model() -> gluoncv.model_zoo.deeplabv3.DeepLabV3:
 def get_segementation(
     input_img: np.ndarray,
     seg_model: gluoncv.model_zoo.deeplabv3.DeepLabV3
-) -> pil.Image:
+) -> .matplotlib.image:
     """
     Performs semantic segmentation on the input image using the provided model.
 
