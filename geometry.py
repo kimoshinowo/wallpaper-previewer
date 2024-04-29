@@ -6,8 +6,13 @@ import cv2
 from matplotlib import pyplot as plt
 import transforms
 
-def cluster_corners(all_corners: np.ndarray, min_samples: int, width: int) -> np.ndarray:
-    """Find only most dense clusters for the corners.
+def cluster_corners(
+    all_corners: np.ndarray,
+    min_samples: int,
+    width: int
+) -> np.ndarray:
+    """
+    Find only most dense clusters for the corners.
 
     Parameters
     ----------
@@ -43,8 +48,13 @@ def cluster_corners(all_corners: np.ndarray, min_samples: int, width: int) -> np
     return corner_inds
 
 
-def find_corners(hough_corners: np.ndarray, harris_corners: np.ndarray, width: int) -> np.ndarray:
-    """Performs clustering on the hough and harris corners to find likely room corners.
+def find_corners(
+    hough_corners: np.ndarray,
+    harris_corners: np.ndarray,
+    width: int
+) -> np.ndarray:
+    """
+    Performs clustering on the hough and harris corners to find likely room corners.
 
     Parameters
     ----------
@@ -77,7 +87,8 @@ def create_wall_corner_map(
     walls: np.ndarray,
     corner_inds: np.ndarray,
 ) -> np.ndarray:
-    """Generate a high contrast image showing only walls, non-walls, and wall corners, that can be used to find geometry.
+    """
+    Generate a high contrast image showing only walls, non-walls, and wall corners, that can be used to find geometry.
 
     Parameters
     ----------
@@ -107,7 +118,8 @@ def create_wall_corner_map(
 
 
 def find_contours(only_walls: np.ndarray) -> np.ndarray:
-    """Finds the geometry (contours) of shapes in the image.
+    """
+    Finds the geometry (contours) of shapes in the image.
 
     Parameters
     ----------
@@ -144,7 +156,8 @@ def find_contours(only_walls: np.ndarray) -> np.ndarray:
 
 
 def find_walls(contours: np.ndarray, corner_inds: np.ndarray) -> list:
-    """Keep only shapes which have at least one point on the corner wall.
+    """
+    Keep only shapes which have at least one point on the corner wall.
 
     Parameters
     ----------
@@ -180,7 +193,8 @@ def find_walls(contours: np.ndarray, corner_inds: np.ndarray) -> list:
 
 
 def remove_duplicate_walls(geom: list) -> list:
-    """Remove any duplicate walls.
+    """
+    Remove any duplicate walls.
 
     Parameters
     ----------
@@ -212,7 +226,8 @@ def remove_duplicate_walls(geom: list) -> list:
 
 
 def remove_nested_geometry(geom: list) -> list:
-    """Removes any polygon which has a point inside another polygon in the list.
+    """
+    Removes any polygon which has a point inside another polygon in the list.
 
     Parameters
     ----------
@@ -257,7 +272,8 @@ def remove_nested_geometry(geom: list) -> list:
 
 
 def find_quadrilaterals(corner_adj_geom: list) -> list:
-    """Estimate quadrilaterals from the polygons already found.
+    """
+    Estimate quadrilaterals from the polygons already found.
 
     Parameters
     ----------
@@ -300,8 +316,13 @@ def find_quadrilaterals(corner_adj_geom: list) -> list:
     return new_geom
 
 
-def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray, width: int) -> np.ndarray:
-    """Move the vertical edges of the wall geometry to the identified corner points of the room.
+def move_edges_to_corners(
+    new_geom: np.ndarray,
+    corner_inds: np.ndarray,
+    width: int
+) -> np.ndarray:
+    """
+    Move the vertical edges of the wall geometry to the identified corner points of the room.
 
     Parameters
     ----------
@@ -358,8 +379,14 @@ def move_edges_to_corners(new_geom: np.ndarray, corner_inds: np.ndarray, width: 
     return fixed_geom
 
 
-def find_floor_intersection(walls: np.ndarray, floor: np.ndarray, depth_map: np.ndarray, corner_inds: np.ndarray) -> list:
-    """Estimate the y-values of the coordinates where the corners of the room intersect with the floor.
+def find_floor_intersection(
+    walls: np.ndarray,
+    floor: np.ndarray,
+    depth_map: np.ndarray,
+    corner_inds: np.ndarray
+) -> list:
+    """
+    Estimate the y-values of the coordinates where the corners of the room intersect with the floor.
 
     Parameters
     ----------
@@ -396,8 +423,13 @@ def find_floor_intersection(walls: np.ndarray, floor: np.ndarray, depth_map: np.
     return intersection_ys
 
 
-def set_geom_corner_intersection(new_geom: np.ndarray, corner_inds: np.ndarray, intersection_ys: list) -> list:
-    """Amend the wall geometry to use the identified corner-floor intersection points.
+def set_geom_corner_intersection(
+    new_geom: np.ndarray,
+    corner_inds: np.ndarray,
+    intersection_ys: list
+) -> list:
+    """
+    Amend the wall geometry to use the identified corner-floor intersection points.
 
     Parameters
     ----------

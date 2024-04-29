@@ -8,7 +8,8 @@ import PIL.Image as pil
 
 
 def estimate_depth(image: pil.Image) -> pil.Image:
-    """Performs monocular depth estimation on an rgb image.
+    """
+    Performs monocular depth estimation on an rgb image.
     Implemented as per pre-trained model instructions https://huggingface.co/vinvino02/glpn-nyu
 
     Parameters
@@ -51,7 +52,8 @@ def estimate_depth(image: pil.Image) -> pil.Image:
 
 
 def get_mean_depths(depth_image: pil.Image, other: np.ndarray) -> np.ndarray:
-    """Find the mean depth for each column (1px wide) in the wall depth map and plot.
+    """
+    Find the mean depth for each column (1px wide) in the wall depth map and plot.
 
     Parameters
     ----------
@@ -87,7 +89,8 @@ def get_mean_depths(depth_image: pil.Image, other: np.ndarray) -> np.ndarray:
 
 
 def get_harris_corners(matrix: np.ndarray) -> np.ndarray:
-    """Performs and plots harris corner detection.
+    """
+    Performs and plots harris corner detection.
 
     Parameters
     ----------

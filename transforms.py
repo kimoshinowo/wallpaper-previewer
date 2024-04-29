@@ -8,7 +8,8 @@ from operator import itemgetter
 
 
 def find_hypotenuse(wall_coords: np.ndarray) -> float:
-    """Find length of the horizontal edge of the wall.
+    """
+    Find length of the horizontal edge of the wall.
 
     Parameters
     ----------
@@ -34,7 +35,8 @@ def find_hypotenuse(wall_coords: np.ndarray) -> float:
 
 
 def find_wall_height(wall_coords: np.ndarray) -> int:
-    """Find the height of the wall (on longest edge).
+    """
+    Find the height of the wall (on longest edge).
 
     Parameters
     ----------
@@ -59,7 +61,8 @@ def find_wall_height(wall_coords: np.ndarray) -> int:
 
 
 def order_corner_points(wall_coords: np.ndarray) -> np.ndarray:
-    """_summary_
+    """
+    Order the corner points of a quadrilateral going clockwise from the bottom left.
 
     Parameters
     ----------
@@ -71,27 +74,6 @@ def order_corner_points(wall_coords: np.ndarray) -> np.ndarray:
     np.ndarray
         Corner coordinates of the wall, in the required order.
     """
-    # xs = []
-    # # find 2 smallest x
-    # for i in wall_coords:
-    #     xs.append(i[0])
-    # xs = np.array(xs)
-    # largest_xs = [0, 1, 2, 3]
-    # smallest_xs = np.argpartition(xs, 2)[:2]
-    # [largest_xs.remove(smallest_xs[i]) for i in range(2)]
-
-    # # of those, find biggest y and smallest y
-    # left_points = wall_coords[smallest_xs]
-    # tl = left_points[np.argmax(left_points[:, 1])]
-    # bl = left_points[np.argmin(left_points[:, 1])]
-
-    # # find biggest y and smallest y of the 2 largest x values
-    # largest_xs = np.array(largest_xs)
-    # right_points = wall_coords[largest_xs]
-    # tr = right_points[np.argmax(right_points[:, 1])]
-    # br = right_points[np.argmin(right_points[:, 1])]
-
-    # ordered_points = np.array([bl, tl, tr, br])
     wall_coords = wall_coords.tolist()
     shapely_poly = Polygon(wall_coords)
     centre = shapely_poly.centroid
@@ -108,7 +90,6 @@ def order_corner_points(wall_coords: np.ndarray) -> np.ndarray:
     t = np.array(angles, dtype=object)
     temp = t[:, 1].astype(float)
     count = np.where(temp>= 90)[0].size
-    # count2 = len(set(np.where(temp>= 0)[0]).intersection(set(np.where(temp<= 90)[0])))
     count2 = np.where(temp>= 0)[0].size
 
     if count >= 2:
@@ -124,9 +105,13 @@ def order_corner_points(wall_coords: np.ndarray) -> np.ndarray:
 
 
 def crop_wallpaper(
-    height: int, width: float, repeat_div: int, temp_tiled: np.ndarray
+    height: int,
+    width: float,
+    repeat_div: int,
+    temp_tiled: np.ndarray
 ) -> np.ndarray:
-    """Crop the tiled wallpaper image.
+    """
+    Crop the tiled wallpaper image.
 
     Parameters
     ----------
@@ -166,7 +151,8 @@ def crop_wallpaper(
 
 
 def get_corners(tiled: np.ndarray) -> np.ndarray:
-    """Gets an array containing the four corner points of the tiled wallpaper image.
+    """
+    Gets an array containing the four corner points of the tiled wallpaper image.
 
     Parameters
     ----------
@@ -191,9 +177,14 @@ def get_corners(tiled: np.ndarray) -> np.ndarray:
 
 
 def get_transformed_wallpaper(
-    new_geom: list, height: int, width: int, size: tuple, wallpaper: np.ndarray
+    new_geom: list,
+    height: int,
+    width: int,
+    size: tuple,
+    wallpaper: np.ndarray
 ) -> "tuple[np.ndarray, np.ndarray]":
-    """Create a wallpaper image where each wall is transformed to the correct size and shape.
+    """
+    Create a wallpaper image where each wall is transformed to the correct size and shape.
 
     Parameters
     ----------
@@ -268,8 +259,14 @@ def get_transformed_wallpaper(
     return (result_1, result_2)
 
 
-def get_wall_mask(new_geom: list, height: int, width: int, walls: np.ndarray) -> "tuple[np.ndarray, np.ndarray]":
-    """Get mask of walls.
+def get_wall_mask(
+    new_geom: list,
+    height: int,
+    width: int,
+    walls: np.ndarray
+) -> "tuple[np.ndarray, np.ndarray]":
+    """
+    Get mask of walls.
 
     Parameters
     ----------
@@ -284,8 +281,8 @@ def get_wall_mask(new_geom: list, height: int, width: int, walls: np.ndarray) ->
 
     Returns
     -------
-    np.ndarray
-        Mask of points labelled as wall and which are also part of the geometry.
+    tuple[np.ndarray, np.ndarray]
+        The mask of points labelled as wall and which are part of the geometry, and the mask of points which are on the walls but not covered by geometry.
     """
     # new wall indices
     geom_mask = []
@@ -323,6 +320,7 @@ def get_wall_mask(new_geom: list, height: int, width: int, walls: np.ndarray) ->
             for j in range(width):
                 if wall_mask[i, j] + geom_mask[i, j] == 2:
                     final_mask[i, j] = 1
+                # For if extra mask should be used to cover any uncovered bits of walls
                 # if wall_mask[i, j] == 1 and geom_mask[i, j] == 0:
                 #     extra_mask[i, j] = 1
     else:
@@ -332,9 +330,15 @@ def get_wall_mask(new_geom: list, height: int, width: int, walls: np.ndarray) ->
 
 
 def combine_wallpaper_and_input(
-    input_cv2: np.ndarray, final_mask: np.ndarray, extra_mask, result_1: np.ndarray, result_2: np.ndarray, walls: np.ndarray
+    input_cv2: np.ndarray,
+    final_mask: np.ndarray,
+    extra_mask: np.ndarray,
+    result_1: np.ndarray,
+    result_2: np.ndarray,
+    walls: np.ndarray
 ) -> "tuple[np.ndarray, np.ndarray]":
-    """Combine transformed wallpaper image with input room image using masks.
+    """
+    Combine transformed wallpaper image with input room image using masks.
 
     Parameters
     ----------
@@ -342,6 +346,8 @@ def combine_wallpaper_and_input(
         Input room image.
     final_mask : np.ndarray
         Mask of points labelled as wall and which are also part of the geometry.
+    extra_mask : 
+        Mask of points which are on the wallS and are not covered by geometry.
     result_1 : np.ndarray
         Transformed wallpaper image.
     result_2 : np.ndarray

@@ -6,7 +6,8 @@ from scipy.ndimage.filters import gaussian_filter
 
 
 def import_and_resize(filename: str) -> pil.Image:
-    """Open image with PIL and resave to smaller size if needed (to stop CPU error).
+    """
+    Open image with PIL and resave to smaller size if needed (to stop CPU error).
 
     Parameters
     ----------
@@ -26,7 +27,8 @@ def import_and_resize(filename: str) -> pil.Image:
 
 
 def import_mx_image(filename: str) -> np.ndarray:
-    """Loads an image using the mxnet image loader.
+    """
+    Loads an image using the mxnet image loader.
 
     Parameters
     ----------
@@ -43,7 +45,8 @@ def import_mx_image(filename: str) -> np.ndarray:
 
 
 def import_cv2_image(filename: str) -> np.ndarray:
-    """Loads an image from the cv2 image reader.
+    """
+    Loads an image from the cv2 image reader.
 
     Parameters
     ----------
@@ -60,7 +63,8 @@ def import_cv2_image(filename: str) -> np.ndarray:
 
 
 def get_labels_string(img: np.ndarray, rng: int) -> np.ndarray:
-    """Combines RGB values of an image into a string at each pixel to use as a label.
+    """
+    Combines RGB values of an image into a string at each pixel to use as a label.
 
     Parameters
     ----------
@@ -84,7 +88,8 @@ def get_labels_string(img: np.ndarray, rng: int) -> np.ndarray:
 
 
 def find_colour_indices(labels: np.ndarray, colour_string: str) -> np.ndarray:
-    """Save the indices of every pixel that is the specified colour.
+    """
+    Save the indices of every pixel that is the specified colour.
 
     Parameters
     ----------
@@ -104,7 +109,8 @@ def find_colour_indices(labels: np.ndarray, colour_string: str) -> np.ndarray:
 
 
 def find_not_colour_indices(labels: np.ndarray, colour_string: str) -> np.ndarray:
-    """Save the indices of every pixel that isn't the specified colour.
+    """
+    Save the indices of every pixel that isn't the specified colour.
 
     Parameters
     ----------
@@ -138,7 +144,8 @@ def find_not_colour_indices(labels: np.ndarray, colour_string: str) -> np.ndarra
 
 
 def get_matrix(line: np.ndarray) -> np.ndarray:
-    """Create a matrix image of a line graph.
+    """
+    Create a matrix image of a line graph.
 
     Parameters
     ----------
