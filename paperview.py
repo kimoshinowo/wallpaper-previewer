@@ -106,7 +106,7 @@ def pipeline(filename, wallpaper_filename, corners = None):
     # Find room geometry
     contours = geometry.find_contours(only_walls)
     corner_adj_geom = geometry.find_walls(contours, corner_inds)
-    new_geom = geometry.find_quadrilaterals(corner_adj_geom, width)
+    new_geom = geometry.find_quadrilaterals(corner_adj_geom)
     new_corner_geom = geometry.remove_nested_geometry(new_geom)
     new_corner_geom = geometry.move_edges_to_corners(new_corner_geom, corner_inds, width)
 
