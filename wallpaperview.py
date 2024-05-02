@@ -4,6 +4,7 @@ import PIL.Image as pil
 import sys
 from matplotlib import pyplot as plt
 import matplotlib.image as mpimg
+import os
 import warnings
 # Import custom methods
 with warnings.catch_warnings():
@@ -225,6 +226,11 @@ if correct != 'y':
     sys.exit()
 
 print("Pipeline is running, please wait...")
+
+if not os.path.exists("outputs"):
+    os.mkdir("outputs")
+if not os.path.exists("images/outputs/intermediate-outputs"):
+    os.mkdir("images/outputs/intermediate-outputs")
 
 output, output_simple = pipeline(room_img_path, wallpaper_img_path)
 cv2.imwrite("outputs/output.png", output)
