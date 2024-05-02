@@ -8,8 +8,8 @@ The required conda environment can be created from `pipeline-env.txt`.
 
 ## Running the pipeline
 
-Run the following in order to run the application:
+The files needed to run the pipeline are: depth-estimation.py, edge_detection.py, general_methods.py, geometry.py, semantic_segmentation.py, transforms.py and wallpaperview.py. These should all be stored in the same directory. Then run the following in order to run the application:
 
 `python wallpaperview.py`
 
-Follow the instructions shown in the command prompt once the script is running.
+Follow the instructions shown in the command prompt once the script is running. Outputs will be saved to a folder called 'outputs' in the same directory as the code.
