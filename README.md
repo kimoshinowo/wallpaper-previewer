@@ -10,6 +10,6 @@ The required conda environment can be created from `pipeline-env.txt`.
 
 Run the following in order to run the application:
 
-`python paperview.py`
+`python wallpaperview.py`
 
 Follow the instructions shown in the command prompt once the script is running.

@@ -237,7 +237,7 @@ output_img_simple.show()
 improve = input("Would you like to answer a question to attempt to help improve the output? (y/n): ")
 
 if improve != 'y':
-    print("Thank you for using PaperView. Your ouput has been saved.")
+    print("Thank you for using WallpaperView. Your ouput has been saved.")
 else:
     graph_img_fig = mpimg.imread("images/outputs/intermediate-outputs/resized-input.png")
     plt.imshow(graph_img_fig)
@@ -258,4 +258,4 @@ else:
     output_img = pil.open("outputs/improved-output.png")
     output_img.show()
 
-    print("Thank you for using PaperView. Your ouput has been saved.")
+    print("Thank you for using WallpaperView. Your ouput has been saved.")
