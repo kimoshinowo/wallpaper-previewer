@@ -4,7 +4,7 @@ This is a wallpaper previewing pipline, which allows input of a room image and a
 
 ## Required Installations
 
-The required conda environment can be created from `pipeline-env.yml`.
+The required Anaconda environment can be created from `pipeline-env.yml`. The Anaconda environment should be activated before running the pipeline. Activate the environment by running `conda activate pipeline-env`.
 
 ## Running the pipeline
 
@@ -17,4 +17,4 @@ Follow the instructions shown in the command prompt once the script is running. 
 
 ## Evaluating the pipeline
 
-The code used for analysis of the pipeline and an existing application is stored in the performance-testing-and-analysis directory.
+The code used for analysis of the pipeline and the existing application is stored in the performance-testing-and-analysis directory.
