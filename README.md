@@ -4,7 +4,7 @@ This is a wallpaper previewing pipline, which allows input of a room image and a
 
 ## Required Installations
 
-The required conda environment can be created from `pipeline-env.txt`.
+The required conda environment can be created from `pipeline-env.yaml`.
 
 ## Running the pipeline
 
