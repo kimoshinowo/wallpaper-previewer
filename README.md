@@ -13,3 +13,8 @@ The files needed to run the pipeline are: depth-estimation.py, edge_detection.py
 `python wallpaperview.py`
 
 Follow the instructions shown in the command prompt once the script is running. Outputs will be saved to a folder called 'outputs' in the same directory as the code.
+
+
+## Evaluating the pipeline
+
+The code used for analysis of the pipeline and an existing application is stored in the performance-testing-and-analysis directory.
